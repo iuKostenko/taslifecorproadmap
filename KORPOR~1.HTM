@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Корпоративна виписка — Роадмеп продукту</title>
+<style>
+  :root{
+    --bg:#0e1525;
+    --bg-soft:#152033;
+    --card:#172132;
+    --card-2:#1e2a3d;
+    --line:#2a3a52;
+    --txt:#e8eef7;
+    --txt-dim:#9fb0c7;
+    --txt-mute:#6f819b;
+    --accent:#5b8cff;
+    --accent-2:#37d4a7;
+    --done:#37d4a7;
+    --done-bg:rgba(55,212,167,.12);
+    --next:#5b8cff;
+    --next-bg:rgba(91,140,255,.12);
+    --later:#b08cff;
+    --later-bg:rgba(176,140,255,.12);
+    --shadow:0 8px 28px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#1b2c4a 0%,var(--bg) 55%) fixed;
+    color:var(--txt);
+    line-height:1.55;
+    padding:0 0 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* HEADER */
+  header.hero{padding:54px 0 28px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:700;margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--accent-2);border-radius:2px}
+  h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;font-weight:800;letter-spacing:-.02em}
+  .subtitle{margin-top:14px;font-size:17px;color:var(--txt-dim);max-width:720px}
+
+  /* STAT STRIP */
+  .stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+  .stat{
+    flex:1 1 150px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:16px 18px;
+  }
+  .stat .num{font-size:28px;font-weight:800;letter-spacing:-.02em}
+  .stat .num.done{color:var(--done)}
+  .stat .num.next{color:var(--next)}
+  .stat .num.later{color:var(--later)}
+  .stat .lbl{font-size:13px;color:var(--txt-mute);margin-top:2px}
+
+  /* TEAM */
+  .team{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .team-title{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .team-title .tt-sum{color:var(--txt-dim);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:12.5px}
+  .team-list{display:flex;flex-wrap:wrap;gap:12px}
+  .member{display:flex;align-items:center;gap:11px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:9px 14px 9px 9px;flex:1 1 230px;min-width:210px}
+  .m-ava{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0e1525}
+  .m-info{flex:1;min-width:0}
+  .m-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-role{font-size:12px;color:var(--txt-mute);margin-top:1px}
+  .fte{flex:none;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .fte.full{background:var(--done-bg);color:var(--done)}
+  .fte.part{background:var(--later-bg);color:var(--later)}
+
+  /* PROGRESS RAIL */
+  .rail-wrap{margin:34px 0 8px}
+  .rail-title{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;font-weight:700}
+  .rail{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+  .rail-node{
+    flex:1 1 0;min-width:118px;cursor:pointer;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 13px;transition:.18s;position:relative;
+  }
+  .rail-node:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .rail-node .rn-rel{font-size:11.5px;font-weight:700;color:var(--txt-mute);letter-spacing:.05em}
+  .rail-node .rn-name{font-size:13px;font-weight:600;margin-top:4px;color:var(--txt)}
+  .rail-node .rn-dot{position:absolute;top:12px;right:12px;width:9px;height:9px;border-radius:50%}
+  .dot-done{background:var(--done);box-shadow:0 0 0 4px var(--done-bg)}
+  .dot-next{background:var(--next);box-shadow:0 0 0 4px var(--next-bg)}
+  .dot-later{background:var(--later);box-shadow:0 0 0 4px var(--later-bg)}
+
+  /* FILTERS */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:36px 0 8px}
+  .filters .f-lbl{font-size:13px;color:var(--txt-mute);margin-right:4px}
+  .chip{
+    border:1px solid var(--line);background:var(--card);color:var(--txt-dim);
+    padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{color:var(--txt);border-color:var(--accent)}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip .c-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+
+  /* TIMELINE */
+  .timeline{position:relative;margin-top:26px;padding-left:36px}
+  .timeline::before{
+    content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;
+    background:linear-gradient(var(--done),var(--next),var(--later));border-radius:2px;
+  }
+  .rel{position:relative;margin-bottom:18px}
+  .rel-marker{
+    position:absolute;left:-30px;top:22px;width:18px;height:18px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--next);z-index:2;
+  }
+  .rel.s-done .rel-marker{border-color:var(--done)}
+  .rel.s-later .rel-marker{border-color:var(--later)}
+
+  .rel-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;transition:.18s;
+  }
+  .rel-card:hover{border-color:#36507a}
+  .rel-head{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;cursor:pointer;user-select:none}
+  .rel-badge{
+    flex:none;width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;font-weight:800;background:var(--card-2);border:1px solid var(--line);
+  }
+  .rel-badge .rb-r{font-size:9px;color:var(--txt-mute);letter-spacing:.08em}
+  .rel-badge .rb-n{font-size:22px;line-height:1;margin-top:1px}
+  .rel.s-done .rel-badge{border-color:var(--done);color:var(--done)}
+  .rel.s-next .rel-badge{border-color:var(--next);color:var(--next)}
+  .rel.s-later .rel-badge{border-color:var(--later);color:var(--later)}
+
+  .rel-head-main{flex:1;min-width:0}
+  .rel-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .rel-value{font-size:14.5px;color:var(--txt-dim);margin-top:4px}
+  .rel-meta{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+  .status-pill{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.02em}
+  .sp-done{background:var(--done-bg);color:var(--done)}
+  .sp-next{background:var(--next-bg);color:var(--next)}
+  .sp-later{background:var(--later-bg);color:var(--later)}
+  .feat-count{font-size:12.5px;color:var(--txt-mute)}
+  .chev{flex:none;color:var(--txt-mute);transition:transform .25s;margin-top:6px}
+  .rel.open .chev{transform:rotate(180deg)}
+
+  .rel-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .rel-body-inner{padding:2px 22px 22px}
+  .grp{border-top:1px solid var(--line);padding:16px 0 4px}
+  .grp:first-child{border-top:1px dashed var(--line)}
+  .grp-name{font-size:13px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .grp-name .gn-ico{font-size:15px}
+  .feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+  .feat{
+    background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;
+    padding:10px 13px;font-size:13.5px;color:var(--txt);display:flex;gap:9px;align-items:flex-start;
+  }
+  .feat::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:7px}
+  .rel.s-done .feat::before{background:var(--done)}
+  .rel.s-later .feat::before{background:var(--later)}
+
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;background:var(--card-2);color:var(--txt-mute);
+    border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px;letter-spacing:.03em}
+
+  /* VIEW SWITCH */
+  .view-switch{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:30px;gap:4px}
+  .vs-btn{border:none;background:transparent;color:var(--txt-dim);font-weight:700;font-size:14px;padding:8px 20px;border-radius:999px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px}
+  .vs-btn:hover{color:var(--txt)}
+  .vs-btn.active{background:var(--accent);color:#fff}
+  .view{display:none}
+  .view.active{display:block}
+
+  /* GANTT */
+  .gantt-note{font-size:13px;color:var(--txt-mute);margin:18px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .gantt-legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 18px}
+  .gl{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt-dim)}
+  .gl .glb{width:22px;height:11px;border-radius:3px}
+  .glb.done{background:var(--done)} .glb.next{background:var(--next)} .glb.later{background:var(--later)}
+  .gantt-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
+  .gantt{min-width:880px;position:relative}
+  .g-row{display:grid;grid-template-columns:300px 1fr;border-top:1px solid var(--line)}
+  .g-row.head{border-top:none;position:sticky;top:0;z-index:5;background:var(--card-2)}
+  .g-label{padding:13px 16px;display:flex;align-items:flex-start;gap:11px;border-right:1px solid var(--line)}
+  .g-label .gl-badge{flex:none;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;background:var(--bg-soft);border:1px solid var(--line);margin-top:1px}
+  .g-row.s-done .gl-badge{border-color:var(--done);color:var(--done)}
+  .g-row.s-next .gl-badge{border-color:var(--next);color:var(--next)}
+  .g-row.s-later .gl-badge{border-color:var(--later);color:var(--later)}
+  .g-label .gl-txt{min-width:0}
+  .g-label .gl-name{font-size:13.5px;font-weight:600;line-height:1.3;white-space:normal;word-break:break-word}
+  .g-label .gl-dur{font-size:11.5px;color:var(--txt-mute);margin-top:4px;white-space:nowrap}
+  .g-track{position:relative;min-height:62px}
+  .g-months{display:grid;height:100%;position:relative}
+  .g-mcell{border-right:1px solid var(--line);font-size:11px;color:var(--txt-mute);padding:9px 4px;text-align:center;white-space:nowrap;overflow:hidden}
+  .g-mcell.q1{color:var(--txt-dim);font-weight:600}
+  .g-grid{position:absolute;inset:0;display:grid;pointer-events:none}
+  .g-grid span{border-right:1px solid var(--line)}
+  .g-bar{position:absolute;top:16px;height:30px;border-radius:7px;cursor:grab;display:flex;align-items:center;justify-content:center;padding:0 14px;font-size:12px;font-weight:700;color:#0e1525;white-space:nowrap;overflow:visible;transition:filter .12s,box-shadow .12s;box-shadow:0 2px 8px rgba(0,0,0,.25);touch-action:none;user-select:none}
+  .g-bar:hover{filter:brightness(1.08)}
+  .g-bar:active,.g-bar.dragging{cursor:grabbing}
+  .g-bar.dragging{filter:brightness(1.14);box-shadow:0 6px 18px rgba(0,0,0,.45);z-index:8}
+  .g-bar .gb-txt{pointer-events:none;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .g-handle{position:absolute;top:0;bottom:0;width:9px;cursor:ew-resize;border-radius:7px;opacity:0;transition:opacity .12s}
+  .g-handle::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:14px;border-radius:2px;background:rgba(14,21,37,.55)}
+  .g-handle.l{left:0} .g-handle.r{right:0}
+  .g-bar:hover .g-handle,.g-bar.dragging .g-handle{opacity:1}
+  .g-bar.done{background:linear-gradient(90deg,#37d4a7,#2bbf95)}
+  .g-bar.next{background:linear-gradient(90deg,#5b8cff,#4574e6);color:#fff}
+  .g-bar.later{background:linear-gradient(90deg,#b08cff,#9a72f0);color:#fff}
+  .g-reset{border:1px solid var(--line);background:var(--card);color:var(--txt-dim);font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:999px;cursor:pointer;transition:.15s}
+  .g-reset:hover{color:var(--txt);border-color:var(--accent)}
+  .g-today{position:absolute;top:0;bottom:0;width:2px;background:#ff5d6c;z-index:4}
+  .g-today-head{position:absolute;top:0;bottom:0;width:2px;background:#ff5d6c;z-index:6}
+  .g-today-head::after{content:"сьогодні";position:absolute;top:5px;left:5px;font-size:10px;font-weight:700;color:#ff5d6c;white-space:nowrap}
+
+  footer{margin-top:46px;padding-top:22px;border-top:1px solid var(--line);color:var(--txt-mute);font-size:13px;text-align:center}
+  .hint{font-size:13px;color:var(--txt-mute);margin-top:8px}
+  @media(max-width:560px){
+    .rel-head{padding:16px}
+    .rel-badge{width:46px;height:46px}
+    header.hero{padding:36px 0 18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Роадмеп продукту</span>
+    <h1>Корпоративна виписка</h1>
+    <p class="subtitle">Шлях продукту від калькулятора та погодження до повної автоматизації виписки договору — у 7 релізах. Натисніть на будь-який реліз, щоб переглянути склад робіт.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="num">7</div><div class="lbl">Релізів у плані</div></div>
+      <div class="stat"><div class="num done">1</div><div class="lbl">Реалізовано</div></div>
+      <div class="stat"><div class="num next">6</div><div class="lbl">У роадмепі</div></div>
+      <div class="stat"><div class="num later">2</div><div class="lbl">Страхові продукти<br>(Персональний захист, ДМС)</div></div>
+    </div>
+
+    <div class="team">
+      <div class="team-title">Команда <span class="tt-sum">· 3 особи · 2,3 FTE</span></div>
+      <div class="team-list">
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#5b8cff,#37d4a7)">ОО</div>
+          <div class="m-info"><div class="m-name">Олена Осінська</div><div class="m-role">PM / BA</div></div>
+          <span class="fte full">Full</span>
+        </div>
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#5b8cff,#7aa5ff)">МП</div>
+          <div class="m-info"><div class="m-name">Максим Пархомчук</div><div class="m-role">Backend</div></div>
+          <span class="fte full">Full</span>
+        </div>
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#b08cff,#9a72f0)">СП</div>
+          <div class="m-info"><div class="m-name">Сергій Паламарчук</div><div class="m-role">Backend</div></div>
+          <span class="fte part">0,3 FTE</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="rail-wrap">
+    <div class="rail-title">Огляд релізів</div>
+    <div class="rail" id="rail"></div>
+  </div>
+
+  <div class="view-switch">
+    <button class="vs-btn active" data-v="timeline">📋 Таймлайн</button>
+    <button class="vs-btn" data-v="gantt">📊 Гант</button>
+  </div>
+
+  <div class="view active" id="view-timeline">
+    <div class="filters">
+      <span class="f-lbl">Показати:</span>
+      <button class="chip active" data-f="all">Усі</button>
+      <button class="chip" data-f="done"><span class="c-dot dot-done"></span>Реалізовано</button>
+      <button class="chip" data-f="next"><span class="c-dot dot-next"></span>Наступні етапи</button>
+      <button class="chip" data-f="later"><span class="c-dot dot-later"></span>Перспектива</button>
+    </div>
+    <p class="hint">Підказка: натискайте на картку, щоб розгорнути деталі. <a href="#" id="expandAll" style="color:var(--accent)">Розгорнути всі</a></p>
+
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <div class="view" id="view-gantt">
+    <div class="gantt-note">📊 Орієнтовний план у часі. <b style="color:var(--txt-dim)">Перетягуйте смуги</b>, щоб зсунути дати; тягніть за <b style="color:var(--txt-dim)">край смуги</b>, щоб змінити тривалість — тижні перелічуються автоматично.</div>
+    <div class="gantt-legend">
+      <span class="gl"><span class="glb done"></span>Реалізовано</span>
+      <span class="gl"><span class="glb next"></span>Наступні етапи</span>
+      <span class="gl"><span class="glb later"></span>Перспектива</span>
+      <button class="g-reset" id="gReset" style="margin-left:auto">↺ Скинути дати</button>
+    </div>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+  </div>
+
+  <footer>
+    Корпоративна виписка · Роадмеп продукту · Сформовано на основі документа «Корпоративна виписка. Подальші дії»
+  </footer>
+</div>
+
+<script>
+const DATA = [
+  {
+    rel:1, status:"done", statusLabel:"Реалізовано",
+    start:"2026-03-02", end:"2026-05-15",
+    title:"Калькулятор та процес погодження",
+    value:"Запущено базу продукту: розрахунок «Персонального захисту», робота з реєстром і повний цикл погодження андерайтером.",
+    groups:[
+      {name:"Форми та інтерфейси", ico:"🖥️", items:[
+        "Створення заявки <span class='tag'>UI_corp_0</span>",
+        "Розрахунок <span class='tag'>UI_corp_2</span>",
+        "Форма андерайтера <span class='tag'>UI_corp_3</span>",
+        "Відправка комерційної пропозиції <span class='tag'>UI_corp_4</span>",
+        "Очікування рішення клієнта <span class='tag'>UI_corp_7</span>",
+        "Назва компанії у загальному гріді заявок",
+        "Пошук клієнта серед записів Єдиного Клієнта (ЄК)"
+      ]},
+      {name:"Калькулятор «Персональний захист»", ico:"🧮", items:[
+        "Калькулятор продукту",
+        "Врахування коефіцієнта військових ризиків",
+        "Розрахунок страхових платежів",
+        "Середньозважені тарифи",
+        "Внески на колектив та на застраховану особу",
+        "Механізм знижок і надбавок для андерайтера"
+      ]},
+      {name:"Реєстр застрахованих осіб", ico:"📋", items:[
+        "Формування шаблону реєстру з переліком обраних ризиків",
+        "Завантаження реєстру ЗО",
+        "Автоматичний розрахунок за даними реєстру",
+        "Валідація структури реєстру"
+      ]},
+      {name:"Погодження андерайтером", ico:"✅", items:[
+        "Знижки/надбавки для кожного ризику",
+        "Редагування розрахунку та повернення на доопрацювання",
+        "Погодження та передача на перестраховика"
+      ]},
+      {name:"Бізнес-процес погодження", ico:"🔄", items:[
+        "Workflow: розрахунок → андерайтинг → очікування клієнта",
+        "Повторна ітерація розрахунку та погодження за потреби"
+      ]},
+      {name:"Комерційна пропозиція", ico:"📨", items:[
+        "Формування шаблону КП",
+        "Оновлений дизайн під нові бізнес-вимоги",
+        "Розширений перелік параметрів у КП",
+        "Відправка на один/декілька email у тілі шаблонного листа"
+      ]}
+    ]
+  },
+  {
+    rel:2, status:"next", statusLabel:"Наступний етап",
+    start:"2026-05-20", end:"2026-06-30",
+    title:"Розширення калькулятора та реєстрів",
+    value:"Гнучкіший розрахунок, канали продажів для посередників і завантаження готових Excel-реєстрів.",
+    groups:[
+      {name:"Клієнт та канали продажів", ico:"🛒", items:[
+        "Вибір каналу продажу для посередників на формі заявки",
+        "Врахування каналу продажу в бізнес-логіці процесу"
+      ]},
+      {name:"Розрахунок", ico:"🧮", items:[
+        "Ручне введення страхової суми по військових ризиках",
+        "Знижки/надбавки андерайтера на рівні договору",
+        "Додавання знижок по договору до знижок по ризику",
+        "Автозаповнення основних полів форми розрахунку"
+      ]},
+      {name:"Реєстр ЗО", ico:"📋", items:[
+        "Завантаження готового Excel-реєстру з розрахованими значеннями",
+        "Валідація імпортованих розрахунків"
+      ]},
+      {name:"Інші покращення", ico:"⚙️", items:[
+        "Лист андерайтеру при переході розрахунку на його процес",
+        "Оптимізація повідомлень про помилки та підказок користувачу"
+      ]}
+    ]
+  },
+  {
+    rel:3, status:"next", statusLabel:"Наступний етап",
+    start:"2026-07-01", end:"2026-08-31",
+    title:"Інтеграція з перестрахуванням",
+    value:"Наскрізний процес погодження з перестраховиком і автоматичні правила передачі ризику.",
+    groups:[
+      {name:"Погодження з перестраховиком", ico:"🤝", items:[
+        "Формування запиту на погодження",
+        "Передача параметрів договору",
+        "Відображення статусу погодження",
+        "Отримання та обробка відповіді перестраховика",
+        "Повторне погодження після внесення змін"
+      ]},
+      {name:"Workflow", ico:"🔄", items:[
+        "Розширення існуючого процесу погодження",
+        "Окремі статуси перестрахування"
+      ]},
+      {name:"Андеррайтинг — автоперевірка правил", ico:"🛡️", items:[
+        "Вік понад 75 років",
+        "Менше 10 осіб у колективі",
+        "Інвалідність або спеціальні медичні умови",
+        "Перевищення лімітів вільного покриття",
+        "Професійний ризик 5 групи"
+      ]}
+    ]
+  },
+  {
+    rel:4, status:"next", statusLabel:"Наступний етап",
+    start:"2026-09-01", end:"2026-10-15",
+    title:"Старт автоматизації виписки договору",
+    value:"Створення клієнта через сервіс Finup і формування головного договору в системі Ліза.",
+    groups:[
+      {name:"Клієнт", ico:"👤", items:[
+        "Форма створення клієнта",
+        "Підключення сервісу Finup",
+        "Створення нової юридичної особи / ФОП",
+        "Оновлення існуючих даних клієнта",
+        "Парсинг даних по особі з Finup на форму",
+        "Синхронізація з ЄК",
+        "Створення та оновлення картки клієнта в Ліза"
+      ]},
+      {name:"Договір", ico:"📄", items:[
+        "Форма створення головного договору",
+        "Створення договору страхування в БД Ліза"
+      ]}
+    ]
+  },
+  {
+    rel:5, status:"later", statusLabel:"Перспектива",
+    start:"2026-10-16", end:"2026-11-30",
+    title:"Фінансовий моніторинг (ФМ)",
+    value:"Збір документів, формування заявки на фінмоніторинг та інтеграція рішень у процес погодження.",
+    groups:[
+      {name:"Процес ФМ", ico:"💳", items:[
+        "Форма відправки запиту документів клієнту",
+        "Завантаження документів для ФМ",
+        "Формування заявки на фінансовий моніторинг",
+        "Інтеграція з процесом погодження договору"
+      ]},
+      {name:"Контроль", ico:"🔍", items:[
+        "Перевірка повноти пакета документів",
+        "Історія рішень ФМ"
+      ]},
+      {name:"Workflow", ico:"🔄", items:[
+        "Відправка заявки на фінмоніторинг",
+        "Отримання рішення ФМ",
+        "Повторна відправка на ФМ за потреби"
+      ]}
+    ]
+  },
+  {
+    rel:6, status:"later", statusLabel:"Перспектива",
+    start:"2026-12-01", end:"2027-01-20",
+    title:"Фінальна виписка договору",
+    value:"Комплексне погодження, підписання, рахунок і автоматичний перехід договору в статус «Діючий».",
+    groups:[
+      {name:"Погодження", ico:"✅", items:[
+        "Комплексне погодження: виконавець, андеррайтер, фінмоніторинг"
+      ]},
+      {name:"Підписання", ico:"✍️", items:[
+        "Підписання договору",
+        "Контроль статусу підписання"
+      ]},
+      {name:"Рахунок", ico:"🧾", items:[
+        "Формування рахунку на оплату",
+        "Відправка рахунку клієнту"
+      ]},
+      {name:"Переведення в діючий", ico:"🟢", items:[
+        "Автоматичне переведення договору в статус «Діючий»",
+        "Відображення активного договору в Ліза та ЄК"
+      ]}
+    ]
+  },
+  {
+    rel:7, status:"later", statusLabel:"Перспектива",
+    start:"2027-01-21", end:"2027-03-31",
+    title:"Калькулятор ДМС",
+    value:"Новий страховий продукт: калькулятор ДМС із масовими розрахунками та повторним використанням наявних процесів.",
+    groups:[
+      {name:"Розрахунок", ico:"🧮", items:[
+        "Реалізація калькулятора ДМС",
+        "Налаштування тарифних моделей"
+      ]},
+      {name:"Реєстр", ico:"📋", items:[
+        "Масові розрахунки по реєстру",
+        "Автоматичне формування пропозиції",
+        "Шаблон комерційної пропозиції"
+      ]},
+      {name:"Інтеграція", ico:"🔗", items:[
+        "Інтеграція з процесом погодження та виписки",
+        "Повторне використання workflow андеррайтингу та ФМ"
+      ]}
+    ]
+  }
+];
+
+const tl = document.getElementById('timeline');
+const rail = document.getElementById('rail');
+
+function featTotal(r){return r.groups.reduce((a,g)=>a+g.items.length,0)}
+
+DATA.forEach(r=>{
+  // rail node
+  const node = document.createElement('div');
+  node.className='rail-node';
+  node.innerHTML=`<span class="rn-dot dot-${r.status}"></span>
+    <div class="rn-rel">РЕЛІЗ ${r.rel}</div>
+    <div class="rn-name">${r.title}</div>`;
+  node.onclick=()=>{
+    const card=document.getElementById('rel-'+r.rel);
+    openCard(card,true);
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  rail.appendChild(node);
+
+  // timeline card
+  const rel=document.createElement('div');
+  rel.className='rel s-'+r.status;
+  rel.id='rel-'+r.rel;
+  rel.dataset.status=r.status;
+
+  const groupsHTML=r.groups.map(g=>`
+    <div class="grp">
+      <div class="grp-name"><span class="gn-ico">${g.ico}</span>${g.name}</div>
+      <div class="feats">
+        ${g.items.map(i=>`<div class="feat"><span>${i}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  rel.innerHTML=`
+    <div class="rel-marker"></div>
+    <div class="rel-card">
+      <div class="rel-head" onclick="toggleCard('rel-${r.rel}')">
+        <div class="rel-badge"><span class="rb-r">РЕЛІЗ</span><span class="rb-n">${r.rel}</span></div>
+        <div class="rel-head-main">
+          <div class="rel-title">${r.title}</div>
+          <div class="rel-value">${r.value}</div>
+          <div class="rel-meta">
+            <span class="status-pill sp-${r.status}">${r.statusLabel}</span>
+            <span class="feat-count">${featTotal(r)} пунктів · ${r.groups.length} напрямів</span>
+          </div>
+        </div>
+        <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="rel-body"><div class="rel-body-inner">${groupsHTML}</div></div>
+    </div>`;
+  tl.appendChild(rel);
+});
+
+function openCard(card,force){
+  const body=card.querySelector('.rel-body');
+  const isOpen=card.classList.contains('open');
+  if(force && isOpen) return;
+  card.classList.add('open');
+  body.style.maxHeight=body.scrollHeight+'px';
+}
+function toggleCard(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.rel-body');
+  if(card.classList.contains('open')){
+    card.classList.remove('open');
+    body.style.maxHeight=null;
+  }else{
+    card.classList.add('open');
+    body.style.maxHeight=body.scrollHeight+'px';
+  }
+}
+
+// filters
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.onclick=()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    const f=chip.dataset.f;
+    document.querySelectorAll('.rel').forEach(rel=>{
+      rel.style.display=(f==='all'||rel.dataset.status===f)?'':'none';
+    });
+  };
+});
+
+// expand all toggle
+let allOpen=false;
+document.getElementById('expandAll').onclick=(e)=>{
+  e.preventDefault();
+  allOpen=!allOpen;
+  document.querySelectorAll('.rel').forEach(rel=>{
+    if(rel.style.display==='none')return;
+    const body=rel.querySelector('.rel-body');
+    if(allOpen){rel.classList.add('open');body.style.maxHeight=body.scrollHeight+'px';}
+    else{rel.classList.remove('open');body.style.maxHeight=null;}
+  });
+  e.target.textContent=allOpen?'Згорнути всі':'Розгорнути всі';
+};
+
+/* ===== GANTT (день-вісь, перетягувані смуги) ===== */
+const MON=["Січ","Лют","Бер","Кві","Тра","Чер","Лип","Сер","Вер","Жов","Лис","Гру"];
+const DAY=864e5;
+function dObj(s){const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function daysIn(y,m){return new Date(y,m+1,0).getDate();}
+function fmtMY(dt){return MON[dt.getMonth()]+" '"+String(dt.getFullYear()).slice(2);}
+function fmtFull(dt){const d=String(dt.getDate()).padStart(2,'0'),m=String(dt.getMonth()+1).padStart(2,'0');return d+"."+m+"."+dt.getFullYear();}
+function weeksBetween(a,b){return Math.max(1,Math.round((b-a)/DAY/7));}
+
+let gstate=null, GAXIS=null;
+function initGState(){gstate=DATA.map(r=>({rel:r.rel,status:r.status,title:r.title,start:dObj(r.start),end:dObj(r.end)}));}
+
+function renderGantt(){
+  if(!gstate) initGState();
+  const g=document.getElementById('gantt');
+  const minD=new Date(Math.min(...gstate.map(x=>+x.start)));
+  const maxD=new Date(Math.max(...gstate.map(x=>+x.end)));
+  const aStart=new Date(minD.getFullYear(),minD.getMonth(),1);            // 1-ше число найранішого місяця
+  const aEnd=new Date(maxD.getFullYear(),maxD.getMonth()+3,0);            // кінець місяця + 2 (запас для перетягування)
+  const totalDays=Math.round((aEnd-aStart)/DAY)+1;
+  const months=[]; let cur=new Date(aStart);
+  while(cur<=aEnd){const y=cur.getFullYear(),m=cur.getMonth();months.push({y,m,days:daysIn(y,m)});cur=new Date(y,m+1,1);}
+  const colTmpl=months.map(mo=>mo.days+'fr').join(' ');                   // ширина місяця пропорційна к-сті днів
+  GAXIS={aStart:+aStart,aEnd:+aEnd,totalDays};
+  const pct=ms=>(ms-(+aStart))/DAY/totalDays*100;
+
+  const tPct=pct(Date.now());
+  const showToday=tPct>=0&&tPct<=100;
+
+  let mcells="";
+  months.forEach((mo,i)=>{
+    const showYear=(mo.m===0)||(i===0);
+    mcells+=`<div class="g-mcell${mo.m%3===0?' q1':''}">${MON[mo.m]}${showYear?" '"+String(mo.y).slice(2):""}</div>`;
+  });
+  let html=`<div class="g-row head"><div class="g-label"><strong style="font-size:11.5px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.08em">Реліз / задача</strong></div>`+
+    `<div class="g-track" style="min-height:auto;position:relative"><div class="g-months" style="grid-template-columns:${colTmpl}">${mcells}</div>`+
+    (showToday?`<div class="g-today-head" style="left:${tPct}%"></div>`:``)+`</div></div>`;
+
+  gstate.forEach(s=>{
+    const L=pct(+s.start), W=(Math.round((s.end-s.start)/DAY)+1)/totalDays*100;
+    const wk=weeksBetween(s.start,s.end);
+    html+=`<div class="g-row s-${s.status}" data-rel="${s.rel}">
+      <div class="g-label">
+        <div class="gl-badge">${s.rel}</div>
+        <div class="gl-txt"><div class="gl-name">${s.title}</div><div class="gl-dur">${fmtMY(s.start)} – ${fmtMY(s.end)} · ≈${wk} тиж</div></div>
+      </div>
+      <div class="g-track">
+        <div class="g-grid" style="grid-template-columns:${colTmpl}">${'<span></span>'.repeat(months.length)}</div>
+        ${showToday?`<div class="g-today" style="left:${tPct}%"></div>`:``}
+        <div class="g-bar ${s.status}" data-rel="${s.rel}" style="left:${L}%;width:${W}%" title="${gbarTitle(s)}"><span class="gb-txt">≈${wk} тиж</span><div class="g-handle l"></div><div class="g-handle r"></div></div>
+      </div>
+    </div>`;
+  });
+  g.innerHTML=html;
+  g.querySelectorAll('.g-bar').forEach(attachDrag);
+}
+
+function gbarTitle(s){return 'Реліз '+s.rel+': '+s.title+' — '+fmtFull(s.start)+' → '+fmtFull(s.end)+' (≈'+weeksBetween(s.start,s.end)+' тиж)';}
+
+function updateBar(bar,s){
+  const L=(+s.start-GAXIS.aStart)/DAY/GAXIS.totalDays*100;
+  const W=(Math.round((s.end-s.start)/DAY)+1)/GAXIS.totalDays*100;
+  const wk=weeksBetween(s.start,s.end);
+  bar.style.left=L+'%'; bar.style.width=W+'%';
+  bar.querySelector('.gb-txt').textContent='≈'+wk+' тиж';
+  bar.title=gbarTitle(s);
+  const dur=bar.closest('.g-row').querySelector('.gl-dur');
+  dur.textContent=fmtMY(s.start)+' – '+fmtMY(s.end)+' · ≈'+wk+' тиж';
+}
+
+function attachDrag(bar){
+  let moved=false;
+  bar.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    const s=gstate.find(x=>x.rel===+bar.dataset.rel);
+    const track=bar.parentElement;
+    const pxPerDay=track.clientWidth/GAXIS.totalDays;
+    const startX=e.clientX, os=+s.start, oe=+s.end;
+    const rect=bar.getBoundingClientRect(), offX=e.clientX-rect.left;
+    const mode = offX<11 ? 'l' : (offX>rect.width-11 ? 'r' : 'move');     // край → зміна тривалості, центр → зсув
+    moved=false;
+    bar.classList.add('dragging');
+    try{bar.setPointerCapture(e.pointerId);}catch(_){}
+    function mv(ev){
+      const dd=Math.round((ev.clientX-startX)/pxPerDay);
+      if(dd!==0) moved=true;
+      let ns=os, ne=oe;
+      if(mode==='move'){
+        const d=Math.max(Math.round((GAXIS.aStart-os)/DAY),Math.min(Math.round((GAXIS.aEnd-oe)/DAY),dd));
+        ns=os+d*DAY; ne=oe+d*DAY;
+      } else if(mode==='r'){
+        ne=Math.min(oe+dd*DAY,GAXIS.aEnd);
+        if((ne-os)/DAY<7) ne=os+7*DAY;
+      } else {
+        ns=Math.max(os+dd*DAY,GAXIS.aStart);
+        if((oe-ns)/DAY<7) ns=oe-7*DAY;
+      }
+      s.start=new Date(ns); s.end=new Date(ne);
+      updateBar(bar,s);
+    }
+    function up(){
+      bar.classList.remove('dragging');
+      try{bar.releasePointerCapture(e.pointerId);}catch(_){}
+      document.removeEventListener('pointermove',mv);
+      document.removeEventListener('pointerup',up);
+      setTimeout(()=>{moved=false;},0);
+    }
+    document.addEventListener('pointermove',mv);
+    document.addEventListener('pointerup',up);
+  });
+  bar.addEventListener('click',()=>{ if(!moved) gotoRelease(+bar.dataset.rel); });
+}
+
+document.getElementById('gReset').addEventListener('click',()=>{initGState();renderGantt();});
+
+function gotoRelease(n){
+  document.querySelector('.vs-btn[data-v="timeline"]').click();
+  const card=document.getElementById('rel-'+n);
+  openCard(card,true);
+  card.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* view switching */
+document.querySelectorAll('.vs-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.vs-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    document.getElementById('view-'+b.dataset.v).classList.add('active');
+  };
+});
+
+// open release 1 by default + build gantt
+window.addEventListener('load',()=>{openCard(document.getElementById('rel-1'),true);renderGantt();});
+</script>
+</body>
+</html>
