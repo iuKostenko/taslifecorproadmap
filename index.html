@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Корпоративна виписка — Роадмеп продукту</title>
+<style>
+  :root{
+    --bg:#0e1525;
+    --bg-soft:#152033;
+    --card:#172132;
+    --card-2:#1e2a3d;
+    --line:#2a3a52;
+    --txt:#e8eef7;
+    --txt-dim:#9fb0c7;
+    --txt-mute:#6f819b;
+    --accent:#5b8cff;
+    --accent-2:#37d4a7;
+    --done:#37d4a7;
+    --done-bg:rgba(55,212,167,.12);
+    --next:#5b8cff;
+    --next-bg:rgba(91,140,255,.12);
+    --later:#b08cff;
+    --later-bg:rgba(176,140,255,.12);
+    --shadow:0 8px 28px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#1b2c4a 0%,var(--bg) 55%) fixed;
+    color:var(--txt);
+    line-height:1.55;
+    padding:0 0 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* HEADER */
+  header.hero{padding:54px 0 28px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:700;margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--accent-2);border-radius:2px}
+  h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;font-weight:800;letter-spacing:-.02em}
+  .subtitle{margin-top:14px;font-size:17px;color:var(--txt-dim);max-width:720px}
+
+  /* STAT STRIP */
+  .stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+  .stat{
+    flex:1 1 150px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:16px 18px;
+  }
+  .stat .num{font-size:28px;font-weight:800;letter-spacing:-.02em}
+  .stat .num.done{color:var(--done)}
+  .stat .num.next{color:var(--next)}
+  .stat .num.later{color:var(--later)}
+  .stat .lbl{font-size:13px;color:var(--txt-mute);margin-top:2px}
+
+  /* TEAM */
+  .team{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .team-title{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .team-title .tt-sum{color:var(--txt-dim);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:12.5px}
+  .team-list{display:flex;flex-wrap:wrap;gap:12px}
+  .member{display:flex;align-items:center;gap:11px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:9px 14px 9px 9px;flex:1 1 230px;min-width:210px}
+  .m-ava{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0e1525}
+  .m-info{flex:1;min-width:0}
+  .m-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-role{font-size:12px;color:var(--txt-mute);margin-top:1px}
+  .fte{flex:none;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .fte.full{background:var(--done-bg);color:var(--done)}
+  .fte.part{background:var(--later-bg);color:var(--later)}
+
+  /* PROGRESS RAIL */
+  .rail-wrap{margin:34px 0 8px}
+  .rail-title{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;font-weight:700}
+  .rail{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+  .rail-node{
+    flex:1 1 0;min-width:118px;cursor:pointer;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 13px;transition:.18s;position:relative;
+  }
+  .rail-node:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .rail-node .rn-rel{font-size:11.5px;font-weight:700;color:var(--txt-mute);letter-spacing:.05em}
+  .rail-node .rn-name{font-size:13px;font-weight:600;margin-top:4px;color:var(--txt)}
+  .rail-node .rn-dot{position:absolute;top:12px;right:12px;width:9px;height:9px;border-radius:50%}
+  .dot-done{background:var(--done);box-shadow:0 0 0 4px var(--done-bg)}
+  .dot-next{background:var(--next);box-shadow:0 0 0 4px var(--next-bg)}
+  .dot-later{background:var(--later);box-shadow:0 0 0 4px var(--later-bg)}
+  .dot-deferred{background:#6f819b;box-shadow:0 0 0 4px rgba(111,129,155,.18)}
+
+  /* FILTERS */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:36px 0 8px}
+  .filters .f-lbl{font-size:13px;color:var(--txt-mute);margin-right:4px}
+  .chip{
+    border:1px solid var(--line);background:var(--card);color:var(--txt-dim);
+    padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{color:var(--txt);border-color:var(--accent)}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip .c-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+
+  /* TIMELINE */
+  .timeline{position:relative;margin-top:26px;padding-left:36px}
+  .timeline::before{
+    content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;
+    background:linear-gradient(var(--done),var(--next),var(--later));border-radius:2px;
+  }
+  .rel{position:relative;margin-bottom:18px}
+  .rel-marker{
+    position:absolute;left:-30px;top:22px;width:18px;height:18px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--next);z-index:2;
+  }
+  .rel.s-done .rel-marker{border-color:var(--done)}
+  .rel.s-later .rel-marker{border-color:var(--later)}
+  .rel.s-deferred .rel-marker{border-color:#6f819b}
+
+  .rel-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;transition:.18s;
+  }
+  .rel-card:hover{border-color:#36507a}
+  .rel-head{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;cursor:pointer;user-select:none}
+  .rel-badge{
+    flex:none;width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;font-weight:800;background:var(--card-2);border:1px solid var(--line);
+  }
+  .rel-badge .rb-r{font-size:9px;color:var(--txt-mute);letter-spacing:.08em}
+  .rel-badge .rb-n{font-size:22px;line-height:1;margin-top:1px}
+  .rel.s-done .rel-badge{border-color:var(--done);color:var(--done)}
+  .rel.s-next .rel-badge{border-color:var(--next);color:var(--next)}
+  .rel.s-later .rel-badge{border-color:var(--later);color:var(--later)}
+  .rel.s-deferred .rel-badge{border-color:#6f819b;color:var(--txt-dim)}
+  .rel.s-deferred .rel-card{opacity:.85}
+
+  .rel-head-main{flex:1;min-width:0}
+  .rel-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .rel-value{font-size:14.5px;color:var(--txt-dim);margin-top:4px}
+  .rel-meta{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+  .status-pill{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.02em}
+  .sp-done{background:var(--done-bg);color:var(--done)}
+  .sp-next{background:var(--next-bg);color:var(--next)}
+  .sp-later{background:var(--later-bg);color:var(--later)}
+  .sp-deferred{background:rgba(111,129,155,.2);color:var(--txt-dim)}
+  .feat-count{font-size:12.5px;color:var(--txt-mute)}
+  .chev{flex:none;color:var(--txt-mute);transition:transform .25s;margin-top:6px}
+  .rel.open .chev{transform:rotate(180deg)}
+
+  .rel-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .rel-body-inner{padding:2px 22px 22px}
+  .grp{border-top:1px solid var(--line);padding:16px 0 4px}
+  .grp:first-child{border-top:1px dashed var(--line)}
+  .grp-name{font-size:13px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .grp-name .gn-ico{font-size:15px}
+  .feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+  .feat{
+    background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;
+    padding:10px 13px;font-size:13.5px;color:var(--txt);display:flex;gap:9px;align-items:flex-start;
+  }
+  .feat::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:7px}
+  .rel.s-done .feat::before{background:var(--done)}
+  .rel.s-later .feat::before{background:var(--later)}
+
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;background:var(--card-2);color:var(--txt-mute);
+    border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px;letter-spacing:.03em}
+
+  /* VIEW SWITCH */
+  .view-switch{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:30px;gap:4px}
+  .vs-btn{border:none;background:transparent;color:var(--txt-dim);font-weight:700;font-size:14px;padding:8px 20px;border-radius:999px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px}
+  .vs-btn:hover{color:var(--txt)}
+  .vs-btn.active{background:var(--accent);color:#fff}
+  .view{display:none}
+  .view.active{display:block}
+
+  /* GANTT */
+  .gantt-note{font-size:13px;color:var(--txt-mute);margin:18px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .gantt-legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 18px}
+  .gl{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt-dim)}
+  .gl .glb{width:22px;height:11px;border-radius:3px}
+  .glb.done{background:var(--done)} .glb.next{background:var(--next)} .glb.later{background:var(--later)}
+  .gantt-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
+  .gantt{min-width:880px;position:relative}
+  .g-row{display:grid;grid-template-columns:300px 1fr;border-top:1px solid var(--line)}
+  .g-row.head{border-top:none;position:sticky;top:0;z-index:5;background:var(--card-2)}
+  .g-label{padding:13px 16px;display:flex;align-items:flex-start;gap:11px;border-right:1px solid var(--line)}
+  .g-label .gl-badge{flex:none;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;background:var(--bg-soft);border:1px solid var(--line);margin-top:1px}
+  .g-row.s-done .gl-badge{border-color:var(--done);color:var(--done)}
+  .g-row.s-next .gl-badge{border-color:var(--next);color:var(--next)}
+  .g-row.s-later .gl-badge{border-color:var(--later);color:var(--later)}
+  .g-row.s-deferred .gl-badge{border-color:#6f819b;color:var(--txt-dim)}
+  .g-deferred{position:absolute;left:6px;right:6px;top:16px;height:30px;border-radius:7px;border:1.5px dashed rgba(111,129,155,.45);background:repeating-linear-gradient(45deg,rgba(111,129,155,.1) 0,rgba(111,129,155,.1) 8px,transparent 8px,transparent 16px);display:flex;align-items:center;justify-content:center;color:var(--txt-mute);font-size:11.5px;font-weight:700;letter-spacing:.02em}
+  .glb.deferred{background:repeating-linear-gradient(45deg,#6f819b 0,#6f819b 3px,transparent 3px,transparent 6px);border:1px solid #6f819b}
+  .g-label .gl-txt{min-width:0}
+  .g-label .gl-name{font-size:13.5px;font-weight:600;line-height:1.3;white-space:normal;word-break:break-word}
+  .g-label .gl-dur{font-size:11.5px;color:var(--txt-mute);margin-top:4px;white-space:nowrap}
+  .g-track{position:relative;min-height:62px}
+  .g-months{display:grid;height:100%;position:relative}
+  .g-mcell{border-right:1px solid var(--line);font-size:11px;color:var(--txt-mute);padding:9px 4px;text-align:center;white-space:nowrap;overflow:hidden}
+  .g-mcell.q1{color:var(--txt-dim);font-weight:600}
+  .g-grid{position:absolute;inset:0;display:grid;pointer-events:none}
+  .g-grid span{border-right:1px solid var(--line)}
+  .g-bar{position:absolute;top:16px;height:30px;border-radius:7px;cursor:grab;display:flex;align-items:center;justify-content:center;padding:0 14px;font-size:12px;font-weight:700;color:#0e1525;white-space:nowrap;overflow:visible;transition:filter .12s,box-shadow .12s;box-shadow:0 2px 8px rgba(0,0,0,.25);touch-action:none;user-select:none}
+  .g-bar:hover{filter:brightness(1.08)}
+  .g-bar:active,.g-bar.dragging{cursor:grabbing}
+  .g-bar.dragging{filter:brightness(1.14);box-shadow:0 6px 18px rgba(0,0,0,.45);z-index:8}
+  .g-bar .gb-txt{pointer-events:none;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .g-handle{position:absolute;top:0;bottom:0;width:9px;cursor:ew-resize;border-radius:7px;opacity:0;transition:opacity .12s}
+  .g-handle::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:14px;border-radius:2px;background:rgba(14,21,37,.55)}
+  .g-handle.l{left:0} .g-handle.r{right:0}
+  .g-bar:hover .g-handle,.g-bar.dragging .g-handle{opacity:1}
+  .g-bar.done{background:linear-gradient(90deg,#37d4a7,#2bbf95)}
+  .g-bar.next{background:linear-gradient(90deg,#5b8cff,#4574e6);color:#fff}
+  .g-bar.later{background:linear-gradient(90deg,#b08cff,#9a72f0);color:#fff}
+  .g-reset{border:1px solid var(--line);background:var(--card);color:var(--txt-dim);font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:999px;cursor:pointer;transition:.15s}
+  .g-reset:hover{color:var(--txt);border-color:var(--accent)}
+  .g-today{position:absolute;top:0;bottom:0;width:2px;background:#ff5d6c;z-index:4}
+  .g-today-head{position:absolute;top:0;bottom:0;width:2px;background:#ff5d6c;z-index:6}
+  .g-today-head::after{content:"сьогодні";position:absolute;top:5px;left:5px;font-size:10px;font-weight:700;color:#ff5d6c;white-space:nowrap}
+
+  footer{margin-top:46px;padding-top:22px;border-top:1px solid var(--line);color:var(--txt-mute);font-size:13px;text-align:center}
+  .hint{font-size:13px;color:var(--txt-mute);margin-top:8px}
+
+  /* ===== UX/UI POLISH: animations, micro-interactions, progress, countdown ===== */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideInLeft{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+  @keyframes pulseToday{0%,100%{opacity:1}50%{opacity:.55}}
+  @keyframes pulsePill{0%,100%{box-shadow:0 0 0 0 rgba(91,140,255,.45)}60%{box-shadow:0 0 0 8px rgba(91,140,255,0)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes progressGrow{from{width:0}}
+
+  /* Entrance staggers — feel "alive" on first paint */
+  .hero .eyebrow{animation:fadeUp .5s .05s both ease-out}
+  .hero h1{animation:fadeUp .55s .12s both ease-out}
+  .hero .subtitle{animation:fadeUp .6s .2s both ease-out}
+  .hero .plan-progress{animation:fadeUp .55s .28s both ease-out}
+  .stats .stat{animation:fadeUp .5s both ease-out}
+  .stats .stat:nth-child(1){animation-delay:.36s}
+  .stats .stat:nth-child(2){animation-delay:.42s}
+  .stats .stat:nth-child(3){animation-delay:.48s}
+  .stats .stat:nth-child(4){animation-delay:.54s}
+  .team{animation:fadeUp .55s .58s both ease-out}
+  .rail-wrap{animation:fadeIn .5s .65s both ease-out}
+  .rail-node{animation:slideInLeft .42s both ease-out}
+  .rail-node:nth-child(1){animation-delay:.68s} .rail-node:nth-child(2){animation-delay:.71s}
+  .rail-node:nth-child(3){animation-delay:.74s} .rail-node:nth-child(4){animation-delay:.77s}
+  .rail-node:nth-child(5){animation-delay:.80s} .rail-node:nth-child(6){animation-delay:.83s}
+  .rail-node:nth-child(7){animation-delay:.86s} .rail-node:nth-child(8){animation-delay:.89s}
+  .rail-node:nth-child(9){animation-delay:.92s} .rail-node:nth-child(10){animation-delay:.95s}
+  .rail-node:nth-child(11){animation-delay:.98s}
+  .view-switch{animation:fadeUp .5s .7s both ease-out}
+  .view.active{animation:fadeIn .35s ease-out}
+  .timeline > *{animation:fadeUp .5s both ease-out}
+  .timeline > *:nth-child(1){animation-delay:.85s} .timeline > *:nth-child(2){animation-delay:.91s}
+  .timeline > *:nth-child(3){animation-delay:.97s} .timeline > *:nth-child(4){animation-delay:1.03s}
+  .timeline > *:nth-child(5){animation-delay:1.09s} .timeline > *:nth-child(6){animation-delay:1.15s}
+  .timeline > *:nth-child(7){animation-delay:1.21s} .timeline > *:nth-child(8){animation-delay:1.27s}
+  .timeline > *:nth-child(9){animation-delay:1.33s} .timeline > *:nth-child(10){animation-delay:1.39s}
+  .timeline > *:nth-child(11){animation-delay:1.45s} .timeline > *:nth-child(12){animation-delay:1.51s}
+  .timeline > *:nth-child(13){animation-delay:1.57s}
+
+  /* Hover micro-interactions */
+  .stat{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+  .stat.clickable{cursor:pointer}
+  .stat.clickable:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 8px 22px rgba(91,140,255,.18)}
+  .stat.clickable::after{content:"↗ фільтр";display:block;font-size:10.5px;color:var(--accent);margin-top:6px;opacity:0;transition:opacity .2s}
+  .stat.clickable:hover::after{opacity:1}
+  .member{transition:transform .18s ease,border-color .18s ease}
+  .member:hover{transform:translateY(-1px);border-color:var(--accent)}
+  .rel-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+  .rel-card:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(0,0,0,.42)}
+  .vs-btn{transition:background .18s,color .18s,transform .15s}
+  .vs-btn:active{transform:scale(.96)}
+  .chip{transition:all .18s,transform .12s}
+  .chip:active{transform:scale(.95)}
+  .rail-node{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .rail-node:hover{box-shadow:0 8px 22px rgba(0,0,0,.3)}
+
+  /* Plan progress bar in hero */
+  .plan-progress{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+  .pp-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:11px}
+  .pp-title{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+  .pp-pct{font-size:15px;font-weight:800;color:var(--accent-2);letter-spacing:.02em}
+  .pp-track{position:relative;height:10px;border-radius:999px;background:var(--bg-soft);overflow:visible}
+  .pp-fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,var(--done) 0%,var(--accent) 60%,var(--later) 100%);background-size:200% 100%;animation:shimmer 5s linear infinite,progressGrow 1.1s .5s both cubic-bezier(.2,.7,.2,1)}
+  .pp-marker{position:absolute;top:-3px;width:2px;height:16px;background:#ff5d6c;border-radius:1px;box-shadow:0 0 0 3px rgba(255,93,108,.18)}
+  .pp-meta{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:12px;font-size:12.5px;color:var(--txt-dim);align-items:center}
+  .pp-meta b{color:var(--txt);font-weight:700}
+  .pp-countdown{display:inline-flex;align-items:center;gap:7px;background:var(--next-bg);color:var(--next);border:1px solid rgba(91,140,255,.35);padding:6px 13px;border-radius:999px;font-size:12.5px;font-weight:700;animation:pulsePill 2.4s ease-in-out infinite}
+  .pp-countdown.done-state{background:var(--done-bg);color:var(--done);border-color:rgba(55,212,167,.35);animation:none}
+
+  /* Card expansion: items fade in with stagger */
+  .rel-body{transition:max-height .42s cubic-bezier(.2,.7,.2,1)}
+  .rel.open .grp{animation:fadeIn .35s both ease-out}
+  .rel.open .grp:nth-child(1){animation-delay:.05s} .rel.open .grp:nth-child(2){animation-delay:.10s}
+  .rel.open .grp:nth-child(3){animation-delay:.15s} .rel.open .grp:nth-child(4){animation-delay:.20s}
+  .rel.open .grp:nth-child(5){animation-delay:.25s} .rel.open .grp:nth-child(6){animation-delay:.30s}
+  .rel.open .grp:nth-child(7){animation-delay:.35s}
+  .rel.open .feat{animation:fadeUp .3s both ease-out;animation-delay:inherit}
+
+  /* Today line — gentle pulse */
+  .g-today,.g-today-head{animation:pulseToday 2.6s ease-in-out infinite}
+
+  /* Gantt quarter tint — every other quarter gets a faint band */
+  .g-grid span.qtint{background:rgba(91,140,255,.03)}
+
+  /* Drag tooltip */
+  .drag-toast{position:fixed;z-index:50;background:var(--card-2);border:1px solid var(--accent);color:var(--txt);padding:9px 14px;border-radius:10px;font-size:12.5px;font-weight:600;pointer-events:none;box-shadow:0 10px 28px rgba(0,0,0,.5);transform:translate(-50%,calc(-100% - 14px));white-space:nowrap;opacity:0;transition:opacity .12s}
+  .drag-toast.show{opacity:1}
+  .drag-toast .dt-dates{color:var(--accent-2);font-weight:700;margin-right:9px}
+  .drag-toast .dt-wk{color:var(--txt-dim)}
+  .drag-toast::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:var(--card-2);border-right:1px solid var(--accent);border-bottom:1px solid var(--accent)}
+
+  /* Sticky view switch under scroll */
+  .view-switch{position:sticky;top:8px;z-index:20;background:rgba(20,28,45,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+  /* Scroll-to-top FAB */
+  .fab-up{position:fixed;right:22px;bottom:22px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--txt-dim);font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s,color .15s,border-color .15s;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .fab-up.show{opacity:1;pointer-events:auto}
+  .fab-up:hover{color:var(--txt);border-color:var(--accent);transform:translateY(-2px)}
+
+  /* Category section headers in timeline */
+  .tl-category{margin:32px 0 6px 30px;padding:2px 0 2px 14px;border-left:3px solid;animation:fadeUp .5s both ease-out;position:relative}
+  .tl-cat-title{font-size:12px;color:var(--txt);text-transform:uppercase;letter-spacing:.16em;font-weight:800;display:flex;align-items:center;gap:9px}
+  .tl-cat-title .tc-emoji{font-size:16px;letter-spacing:0}
+  .tl-cat-sub{font-size:12px;color:var(--txt-mute);margin-top:3px}
+  .tl-category.c-vypyska{border-color:#f0a03c}
+  .tl-category.c-vypyska .tl-cat-title{color:#f0a03c}
+  .tl-category.c-suprovid{border-color:#ff7ab6}
+  .tl-category.c-suprovid .tl-cat-title{color:#ff7ab6}
+
+  /* Category chip on release card */
+  .cat-chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid;margin-right:8px}
+  .cat-chip.c-vypyska{color:#f0a03c;background:rgba(240,160,60,.1);border-color:rgba(240,160,60,.32)}
+  .cat-chip.c-suprovid{color:#ff7ab6;background:rgba(255,122,182,.1);border-color:rgba(255,122,182,.32)}
+
+  /* Category strip on Gantt row */
+  .g-cat-strip{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
+  .g-cat-strip.c-vypyska{background:#f0a03c}
+  .g-cat-strip.c-suprovid{background:#ff7ab6}
+  .g-label{position:relative}
+
+  /* Done-toggle button on rel-head */
+  .done-toggle{flex:none;border:1px solid var(--line);background:var(--card-2);color:var(--txt-mute);font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;align-self:flex-start;margin-top:6px;user-select:none}
+  .done-toggle:hover{color:var(--done);border-color:var(--done);background:var(--done-bg);transform:translateY(-1px)}
+  .done-toggle.marked{color:var(--done);border-color:var(--done);background:var(--done-bg)}
+  .done-toggle.marked::before{content:"✓ "}
+  .rel.s-done .done-toggle{color:var(--done);border-color:var(--done);background:var(--done-bg)}
+  .rel.s-done .done-toggle::before{content:"✓ "}
+  .rel.s-deferred .done-toggle{display:none}
+  .user-done-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--done);background:var(--done-bg);border:1px solid rgba(55,212,167,.35);padding:2px 7px;border-radius:5px;letter-spacing:.03em;margin-left:6px}
+  .user-dates-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:var(--next-bg);border:1px solid rgba(91,140,255,.35);padding:2px 7px;border-radius:5px;letter-spacing:.03em;margin-left:6px}
+
+  /* Date-edit button on rel-head */
+  .date-edit-btn{flex:none;border:1px solid var(--line);background:var(--card-2);color:var(--txt-mute);font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;align-self:flex-start;margin-top:6px;user-select:none}
+  .date-edit-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--next-bg);transform:translateY(-1px)}
+  .date-edit-btn.custom{color:var(--accent);border-color:var(--accent);background:var(--next-bg)}
+
+  /* Popover editor */
+  .de-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .18s;z-index:60;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+  .de-backdrop.show{opacity:1;pointer-events:auto}
+  .date-editor{position:absolute;z-index:70;background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:16px 18px 14px;box-shadow:0 18px 44px rgba(0,0,0,.6);width:340px;max-width:calc(100vw - 32px);opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;transition:opacity .18s,transform .18s}
+  .date-editor.show{opacity:1;transform:none;pointer-events:auto}
+  .de-title{font-size:12.5px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .de-title b{color:var(--accent);font-weight:800;letter-spacing:0;text-transform:none;font-size:15px;background:var(--next-bg);padding:2px 10px;border-radius:6px;border:1px solid rgba(91,140,255,.3)}
+  .de-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
+  .de-fields label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--txt-mute);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .de-fields input[type="date"]{background:var(--bg-soft);border:1px solid var(--line);color:var(--txt);font-size:13px;padding:8px 10px;border-radius:8px;font-family:inherit;color-scheme:dark;transition:border-color .15s}
+  .de-fields input[type="date"]:focus{outline:none;border-color:var(--accent)}
+  .de-duration{font-size:12.5px;color:var(--txt-dim);padding:9px 12px;background:var(--bg-soft);border-radius:8px;margin-bottom:12px;text-align:center;min-height:20px}
+  .de-duration b{color:var(--accent-2);font-weight:700}
+  .de-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+  .de-actions button{border:1px solid var(--line);background:var(--card-2);color:var(--txt-dim);font-size:12.5px;font-weight:700;padding:8px 15px;border-radius:8px;cursor:pointer;transition:all .15s}
+  .de-actions button:hover{color:var(--txt);border-color:var(--accent);transform:translateY(-1px)}
+  .de-actions .de-save{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .de-actions .de-save:hover{filter:brightness(1.1);background:var(--accent);color:#fff}
+  .de-actions .de-reset{color:var(--txt-mute);margin-right:auto;padding:8px 12px}
+  .de-actions .de-reset:hover{color:#ff5d6c;border-color:#ff5d6c}
+  .de-hint{font-size:11px;color:var(--txt-mute);margin-top:9px;text-align:center;font-style:italic}
+
+  /* Save-bar (синхронізація з GitHub) */
+  .save-bar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-top:22px;animation:fadeUp .55s .62s both ease-out}
+  .sb-head{font-size:13px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .sb-count{font-size:11px;font-weight:800;background:var(--accent);color:#fff;padding:2px 10px;border-radius:999px;letter-spacing:0;text-transform:none;display:none}
+  .sb-count.on{display:inline-block;animation:pulsePill 2.4s ease-in-out infinite}
+  .sb-body{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .sb-info{flex:1;min-width:280px;font-size:12.5px;color:var(--txt-dim);display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+  .sb-info b{color:var(--txt);font-weight:600}
+  .sb-icon{font-size:16px;flex:none;line-height:1}
+  .sb-actions{display:flex;gap:9px;flex-wrap:wrap}
+  .sb-btn{border:1px solid var(--line);background:var(--card-2);color:var(--txt-dim);font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .sb-btn:hover{color:var(--txt);border-color:var(--accent);transform:translateY(-1px)}
+  .sb-btn.sb-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .sb-btn.sb-primary:hover{filter:brightness(1.1);color:#fff}
+  .sb-btn.sb-danger:hover{color:#ff5d6c;border-color:#ff5d6c}
+
+  /* Toast (short-lived notification) */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(24px);background:var(--card-2);border:1px solid var(--accent);color:var(--txt);padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:600;pointer-events:none;box-shadow:0 12px 32px rgba(0,0,0,.55);opacity:0;z-index:80;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);text-align:center;line-height:1.4}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .toast.t-success{border-color:var(--done)}
+  .toast.t-error{border-color:#ff5d6c}
+
+  /* Gantt: deferred with dates becomes striped bar */
+  .g-bar.deferred{background:repeating-linear-gradient(45deg,#8ba3c6 0,#8ba3c6 6px,#6f819b 6px,#6f819b 12px);color:#fff}
+
+  /* Suppress entrance animations on re-renders (drag/toggle/date edit) */
+  body.no-anim .timeline > *, body.no-anim .rail-node, body.no-anim .hero > *,
+  body.no-anim .stats .stat, body.no-anim .team, body.no-anim .view-switch,
+  body.no-anim .rail-wrap, body.no-anim .view.active, body.no-anim .plan-progress,
+  body.no-anim .pp-fill{animation:none !important}
+
+  /* Respect reduced-motion */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+    .pp-fill{animation:none !important}
+  }
+
+  @media(max-width:560px){
+    .rel-head{padding:16px}
+    .rel-badge{width:46px;height:46px}
+    header.hero{padding:36px 0 18px}
+    .fab-up{right:14px;bottom:14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Роадмеп продукту</span>
+    <h1>Корпоративна виписка</h1>
+    <p class="subtitle">Шлях продукту від калькулятора та погодження до повної автоматизації виписки договору, супроводу й нового калькулятора ДМС — у 11 релізах. Натисніть на будь-який реліз, щоб переглянути склад робіт.</p>
+
+    <div class="plan-progress" id="planProgress"></div>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="statTotal">11</div><div class="lbl">Релізів у плані</div></div>
+      <div class="stat"><div class="num done" id="statDone">3</div><div class="lbl">Реалізовано</div></div>
+      <div class="stat"><div class="num next" id="statNext">7</div><div class="lbl">У роадмепі</div></div>
+      <div class="stat"><div class="num" style="color:var(--txt-dim)" id="statDeferred">1</div><div class="lbl">Відкладено<br>(перестрахування)</div></div>
+    </div>
+
+    <div class="team">
+      <div class="team-title">Команда <span class="tt-sum">· 4 особи · 3,3 FTE</span></div>
+      <div class="team-list">
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#5b8cff,#37d4a7)">ОО</div>
+          <div class="m-info"><div class="m-name">Олена Осінська</div><div class="m-role">PM / BA</div></div>
+          <span class="fte full">Full</span>
+        </div>
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#5b8cff,#7aa5ff)">МП</div>
+          <div class="m-info"><div class="m-name">Максим Пархомчук</div><div class="m-role">Backend</div></div>
+          <span class="fte full">Full</span>
+        </div>
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#37d4a7,#5b8cff)">ДК</div>
+          <div class="m-info"><div class="m-name">Дмитро Карпов</div><div class="m-role">Backend</div></div>
+          <span class="fte full">Full</span>
+        </div>
+        <div class="member">
+          <div class="m-ava" style="background:linear-gradient(135deg,#b08cff,#9a72f0)">СП</div>
+          <div class="m-info"><div class="m-name">Сергій Паламарчук</div><div class="m-role">Backend</div></div>
+          <span class="fte part">0,3 FTE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-bar">
+      <div class="sb-head">Синхронізація з GitHub <span class="sb-count" id="sbCount"></span></div>
+      <div class="sb-body">
+        <div class="sb-info">
+          <span class="sb-icon">💡</span>
+          <span>Ваші зміни зберігаються <b>у вашому браузері</b> — інші їх не побачать. Щоб оновити спільне посилання: натисніть <b>«Завантажити HTML»</b> і замініть файл <code style="background:var(--bg-soft);padding:1px 6px;border-radius:4px;font-size:12px">index.html</code> у GitHub. Через ~1 хв всі побачать нову версію.</span>
+        </div>
+        <div class="sb-actions">
+          <button class="sb-btn sb-primary" onclick="downloadUpdatedHTML()" title="Завантажити index.html з поточними даними — для коміта в репозиторій">💾 Завантажити HTML</button>
+          <button class="sb-btn" onclick="copyStateLink()" title="Скопіювати посилання, у яке закодовано ваші зміни (для одноразового шерингу)">🔗 Посилання зі змінами</button>
+          <button class="sb-btn sb-danger" onclick="clearAllLocal()" title="Скинути всі ваші локальні зміни">🗑 Скинути</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="rail-wrap">
+    <div class="rail-title">Огляд релізів</div>
+    <div class="rail" id="rail"></div>
+  </div>
+
+  <div class="view-switch">
+    <button class="vs-btn active" data-v="timeline">📋 Таймлайн</button>
+    <button class="vs-btn" data-v="gantt">📊 Гант</button>
+  </div>
+
+  <div class="view active" id="view-timeline">
+    <div class="filters">
+      <span class="f-lbl">Показати:</span>
+      <button class="chip active" data-f="all">Усі</button>
+      <button class="chip" data-f="done"><span class="c-dot dot-done"></span>Реалізовано</button>
+      <button class="chip" data-f="next"><span class="c-dot dot-next"></span>Наступні етапи</button>
+      <button class="chip" data-f="later"><span class="c-dot dot-later"></span>Перспектива</button>
+      <button class="chip" data-f="deferred"><span class="c-dot dot-deferred"></span>Відкладено</button>
+    </div>
+    <p class="hint">Підказка: натискайте на картку, щоб розгорнути деталі. <a href="#" id="expandAll" style="color:var(--accent)">Розгорнути всі</a></p>
+
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <div class="view" id="view-gantt">
+    <div class="gantt-note">📊 Дати можна редагувати кнопкою <b style="color:var(--txt-dim)">📅 Дати</b> на картці релізу; <b style="color:var(--txt-dim)">перетягуйте смуги</b>, щоб зсунути дати; тягніть за <b style="color:var(--txt-dim)">край смуги</b>, щоб змінити тривалість — тижні перелічуються автоматично. Р3 (перестрахування) відкладено.</div>
+    <div class="gantt-legend">
+      <span class="gl"><span class="glb done"></span>Реалізовано</span>
+      <span class="gl"><span class="glb next"></span>Наступні етапи</span>
+      <span class="gl"><span class="glb later"></span>Перспектива</span>
+      <span class="gl"><span class="glb deferred"></span>Відкладено</span>
+      <button class="g-reset" id="gReset" style="margin-left:auto">↺ Скинути дати</button>
+    </div>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+  </div>
+
+  <div class="de-backdrop" id="deBackdrop"></div>
+  <div class="date-editor" id="dateEditor" role="dialog" aria-label="Редагування дат релізу">
+    <div class="de-title">Реліз <b class="de-rel"></b> · дати</div>
+    <div class="de-fields">
+      <label>Старт<input type="date" id="deStart"></label>
+      <label>Кінець<input type="date" id="deEnd"></label>
+    </div>
+    <div class="de-duration" id="deDuration"></div>
+    <div class="de-actions">
+      <button class="de-reset" id="deReset" title="Повернути дати з документа">↺ Оригінал</button>
+      <button class="de-cancel" id="deCancel">Скасувати</button>
+      <button class="de-save" id="deSave">Зберегти</button>
+    </div>
+    <div class="de-hint">Зміни зберігаються у браузері та переживуть перезавантаження</div>
+  </div>
+
+  <footer>
+    Корпоративна виписка · Роадмеп продукту · Сформовано на основі документа «Корпоративна виписка. Подальші дії»
+  </footer>
+</div>
+
+<script>
+const DATA = [
+  {
+    rel:"1", status:"done", statusLabel:"Реалізовано · 26.05.2026",
+    start:"2026-03-02", end:"2026-05-26",
+    title:"Калькулятор та процес погодження",
+    value:"Запущено базу продукту: розрахунок «Персонального захисту», робота з реєстром, повний цикл погодження андерайтером і канали продажів.",
+    groups:[
+      {name:"Форми та інтерфейси", ico:"🖥️", items:[
+        "Створення заявки <span class='tag'>UI_corp_0</span>",
+        "Розрахунок <span class='tag'>UI_corp_2</span>",
+        "Форма андерайтера <span class='tag'>UI_corp_3</span>",
+        "Відправка комерційної пропозиції <span class='tag'>UI_corp_4</span>",
+        "Очікування рішення клієнта <span class='tag'>UI_corp_7</span>",
+        "Назва компанії у загальному гріді заявок",
+        "Пошук клієнта серед записів Єдиного Клієнта (ЄК)"
+      ]},
+      {name:"Калькулятор «Персональний захист»", ico:"🧮", items:[
+        "Калькулятор продукту",
+        "Врахування коефіцієнта військових ризиків",
+        "Розрахунок страхових платежів",
+        "Середньозважені тарифи",
+        "Внески на колектив та на застраховану особу",
+        "Механізм знижок і надбавок для андерайтера"
+      ]},
+      {name:"Реєстр застрахованих осіб", ico:"📋", items:[
+        "Формування шаблону реєстру з переліком обраних ризиків",
+        "Завантаження реєстру ЗО",
+        "Автоматичний розрахунок за даними реєстру",
+        "Валідація структури реєстру"
+      ]},
+      {name:"Погодження андерайтером", ico:"✅", items:[
+        "Знижки/надбавки для кожного ризику",
+        "Редагування розрахунку та повернення на доопрацювання",
+        "Погодження та передача на перестраховика"
+      ]},
+      {name:"Бізнес-процес погодження", ico:"🔄", items:[
+        "Workflow: розрахунок → андерайтинг → очікування клієнта",
+        "Повторна ітерація розрахунку та погодження за потреби"
+      ]},
+      {name:"Комерційна пропозиція", ico:"📨", items:[
+        "Формування шаблону КП",
+        "Оновлений дизайн під нові бізнес-вимоги",
+        "Розширений перелік параметрів у КП",
+        "Відправка на один/декілька email у тілі шаблонного листа"
+      ]},
+      {name:"Клієнт та канали продажів", ico:"🛒", items:[
+        "Вибір каналу продажу для посередників на UI_corp_0",
+        "Врахування каналу продажу в бізнес-логіці процесу"
+      ]}
+    ]
+  },
+  {
+    rel:"2.1", status:"done", statusLabel:"Реалізовано · 23.06.2026",
+    start:"2026-06-23", end:"2026-07-15",
+    title:"Розширення калькулятора та роботи з реєстрами",
+    value:"Гнучкіший розрахунок (військові ризики, нульова стать, знижки на рівні договору) і завантаження готових Excel-реєстрів.",
+    groups:[
+      {name:"Розрахунок", ico:"🧮", items:[
+        "Окреме поле для ручного введення страхової суми по військових ризиках",
+        "Дозволити ввід нульової кількості осіб конкретної статі",
+        "Врахування знижок та надбавок андерайтера на рівні договору"
+      ]},
+      {name:"Реєстр ЗО", ico:"📋", items:[
+        "Завантаження готового Excel-реєстру з попередньо розрахованими значеннями",
+        "Валідація імпортованих розрахунків"
+      ]},
+      {name:"Інші покращення", ico:"⚙️", items:[
+        "Оновлення кількості ЗО на формі за даними завантаженого реєстру",
+        "Лист андерайтеру при переході розрахунку на його процес",
+        "Оптимізація повідомлень про помилки користувачу"
+      ]}
+    ]
+  },
+  {
+    rel:"2.2", status:"done", statusLabel:"Реалізовано · 16.07.2026",
+    start:"2026-07-16", end:"2026-08-19",
+    title:"Знижки/надбавки на 4 рівнях, правила андерайтингу й ліміти",
+    value:"Повна модель знижок/надбавок на всіх рівнях, лімити в калькуляторі, версійність розрахунків і автоматичні правила передачі на андерайтинг.",
+    groups:[
+      {name:"Розрахунок", ico:"🧮", items:[
+        "Знижки/надбавки на рівні особи",
+        "Знижки/надбавки на рівні ризику особи",
+        "Сумування знижок на різних рівнях",
+        "Відображення підсумованих результатів по всім стовпчикам розрахунку",
+        "Автоматичне заповнення основних полів на формі розрахунку",
+        "Обмеження сум СС при розрахунках",
+        "Попередження при спрацюванні ліміту",
+        "Версійність розрахунків"
+      ]},
+      {name:"Андеррайтинг — автоперевірка правил", ico:"🛡️", items:[
+        "Вік понад 75 років",
+        "Менше 10 осіб у колективі",
+        "Інвалідність або спеціальні медичні умови",
+        "Перевищення лімітів вільного покриття",
+        "Професійний ризик 5 групи"
+      ]}
+    ]
+  },
+  {
+    rel:"3", status:"deferred", statusLabel:"Відкладено — після супроводу",
+    start:null, end:null,
+    title:"Інтеграція з перестрахуванням",
+    value:"Відкладено: реалізація запланована після релізів супроводу (Р7–Р9). Конкретна дата буде уточнена.",
+    groups:[
+      {name:"Погодження з перестраховиком", ico:"🤝", items:[
+        "Формування запиту на погодження перестраховику",
+        "Передача параметрів договору для погодження",
+        "Відображення статусу погодження перестраховиком",
+        "Отримання та обробка відповіді перестраховика",
+        "Повторне погодження після внесення змін"
+      ]},
+      {name:"Workflow", ico:"🔄", items:[
+        "Розширення існуючого процесу погодження",
+        "Додавання окремих статусів перестрахування"
+      ]}
+    ]
+  },
+  {
+    rel:"4", status:"next", statusLabel:"Заплановано · 20.07 → 26.08.2026",
+    category:"Виписка та розрахунки",
+    start:"2026-07-20", end:"2026-08-26",
+    title:"Старт автоматизації виписки договору",
+    value:"Створення клієнта через сервіс Finup, синхронізація з ЄК та формування головного договору в системі Ліза.",
+    groups:[
+      {name:"Клієнт", ico:"👤", items:[
+        "Форма створення клієнта",
+        "Підключення сервісу Finup",
+        "Створення нової юридичної особи / ФОП",
+        "Оновлення існуючих даних клієнта",
+        "Вибірка та парсинг даних по особі з Finup на форму",
+        "Синхронізація з ЄК",
+        "Створення та оновлення картки клієнта в Ліза"
+      ]},
+      {name:"Договір", ico:"📄", items:[
+        "Форма створення головного договору",
+        "Створення договору страхування в БД Ліза"
+      ]}
+    ]
+  },
+  {
+    rel:"5", status:"later", statusLabel:"План · 27.08 → 01.10.2026",
+    category:"Виписка та розрахунки",
+    start:"2026-08-27", end:"2026-10-01",
+    title:"Фінансовий моніторинг (ФМ)",
+    value:"Збір документів від клієнта, формування заявки на фінмоніторинг та інтеграція рішень у процес погодження.",
+    groups:[
+      {name:"Процес ФМ", ico:"💳", items:[
+        "Форма відправки запиту документів клієнту",
+        "Завантаження документів для ФМ",
+        "Формування заявки на фінансовий моніторинг",
+        "Інтеграція з процесом погодження договору"
+      ]},
+      {name:"Контроль", ico:"🔍", items:[
+        "Перевірка повноти пакета документів",
+        "Історія рішень ФМ"
+      ]},
+      {name:"Workflow", ico:"🔄", items:[
+        "Відправка заявки на фінмоніторинг",
+        "Отримання рішення ФМ",
+        "Повторна відправка на ФМ (за потреби)"
+      ]}
+    ]
+  },
+  {
+    rel:"6", status:"later", statusLabel:"План · 02.10 → 13.11.2026",
+    category:"Виписка та розрахунки",
+    start:"2026-10-02", end:"2026-11-13",
+    title:"Фінальна виписка договору",
+    value:"Комплексне погодження, підписання, рахунок і автоматичний перехід договору в статус «Діючий».",
+    groups:[
+      {name:"Погодження", ico:"✅", items:[
+        "Комплексне погодження: виконавець, андеррайтер, фінмоніторинг"
+      ]},
+      {name:"Підписання", ico:"✍️", items:[
+        "Підписання договору",
+        "Контроль статусу підписання"
+      ]},
+      {name:"Рахунок", ico:"🧾", items:[
+        "Формування рахунку на оплату",
+        "Відправка рахунку клієнту"
+      ]},
+      {name:"Переведення в діючий", ico:"🟢", items:[
+        "Автоматичне переведення договору в статус «Діючий»",
+        "Відображення активного договору в Ліза, ЄК"
+      ]}
+    ]
+  },
+  {
+    rel:"7", status:"later", statusLabel:"План · 14.11 → 19.12.2026",
+    category:"Супровід та зміни",
+    start:"2026-11-14", end:"2026-12-19",
+    title:"Супровід · Зміна умов договору",
+    value:"Внесення змін у діючий договір: страхувальник, валюта, пакет, періодичність — із перерахунком і ДУ.",
+    groups:[
+      {name:"Зміна страхувальника", ico:"👥", items:[
+        "Ручна зміна страхувальника",
+        "Зміна даних страхувальника",
+        "Проходження ФМ страхувальником"
+      ]},
+      {name:"Інші зміни", ico:"🔧", items:[
+        "Зміна валюти",
+        "Зміна пакету",
+        "Зміна періодичності виплат"
+      ]},
+      {name:"Розрахунок та ДУ", ico:"📑", items:[
+        "Перерахунки внеску залежно від змін",
+        "Побудова нового графіку в Ліза",
+        "Створення нової версії договору в Ліза",
+        "Відправка ДУ клієнту"
+      ]}
+    ]
+  },
+  {
+    rel:"8", status:"later", statusLabel:"План · 20.12.2026 → 17.01.2027",
+    category:"Супровід та зміни",
+    start:"2026-12-20", end:"2027-01-17",
+    title:"Супровід · Зміна застрахованих осіб",
+    value:"Додавання, видалення та зміна даних ЗО в діючому договорі з перерахунком і ДУ.",
+    groups:[
+      {name:"Зміна ЗО", ico:"🧑‍🤝‍🧑", items:[
+        "Додавання нового ЗО",
+        "Видалення існуючого ЗО",
+        "Зміна даних ЗО в договорі"
+      ]},
+      {name:"Розрахунок та ДУ", ico:"📑", items:[
+        "Перерахунки внеску залежно від змін",
+        "Побудова нового графіку в Ліза",
+        "Створення нової версії договору в Ліза",
+        "Відправка ДУ клієнту"
+      ]}
+    ]
+  },
+  {
+    rel:"9", status:"later", statusLabel:"План · 18.01 → 08.02.2027",
+    category:"Супровід та зміни",
+    start:"2027-01-18", end:"2027-02-08",
+    title:"Супровід · Зміна вигодонабувачів",
+    value:"Додавання, видалення вигодонабувачів і масове завантаження їхнього реєстру.",
+    groups:[
+      {name:"Зміна даних", ico:"📝", items:[
+        "Додавання нового вигодонабувача",
+        "Видалення існуючого вигодонабувача",
+        "Завантаження реєстру вигодонабувачів"
+      ]}
+    ]
+  },
+  {
+    rel:"10", status:"later", statusLabel:"План · 09.02 → 15.03.2027",
+    start:"2027-02-09", end:"2027-03-15",
+    title:"Калькулятор ДМС",
+    value:"Новий страховий продукт: калькулятор ДМС із масовими розрахунками та повторним використанням наявних процесів.",
+    groups:[
+      {name:"Розрахунок", ico:"🧮", items:[
+        "Реалізація калькулятора ДМС",
+        "Налаштування тарифних моделей"
+      ]},
+      {name:"Реєстр", ico:"📋", items:[
+        "Масові розрахунки по реєстру",
+        "Автоматичне формування пропозиції",
+        "Шаблон комерційної пропозиції"
+      ]},
+      {name:"Інтеграція", ico:"🔗", items:[
+        "Інтеграція з процесом погодження та виписки",
+        "Повторне використання workflow андеррайтингу та ФМ"
+      ]}
+    ]
+  }
+];
+
+const tl = document.getElementById('timeline');
+const rail = document.getElementById('rail');
+
+function featTotal(r){return r.groups.reduce((a,g)=>a+g.items.length,0)}
+
+/* === Категорії + користувацькі позначки «виконано» + власні дати === */
+const OVERRIDES_KEY='roadmap-user-overrides-v1';
+const DATES_KEY='roadmap-user-dates-v1';
+function loadOverrides(){try{return JSON.parse(localStorage.getItem(OVERRIDES_KEY)||'{}')}catch(_){return {}}}
+function saveOverrides(o){try{localStorage.setItem(OVERRIDES_KEY,JSON.stringify(o))}catch(_){}}
+function loadDates(){try{return JSON.parse(localStorage.getItem(DATES_KEY)||'{}')}catch(_){return {}}}
+function saveDatesLS(d){try{localStorage.setItem(DATES_KEY,JSON.stringify(d))}catch(_){}}
+// Snapshot original status + dates once, щоб можна було безпечно відкатувати
+DATA.forEach(r=>{if(r._origStatus===undefined){r._origStatus=r.status;r._origStatusLabel=r.statusLabel;r._origStart=r.start;r._origEnd=r.end;}});
+
+function fmtDMY(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+
+// Компактний діапазон «старт → реліз». Якщо роки однакові — рік один раз у кінці.
+function fmtRange(startISO, endISO){
+  if(!startISO && !endISO) return null;
+  if(!startISO) return fmtDMY(new Date(endISO));
+  if(!endISO) return fmtDMY(new Date(startISO));
+  const s=new Date(startISO), e=new Date(endISO);
+  const pad=n=>String(n).padStart(2,'0');
+  if(s.getFullYear()===e.getFullYear()){
+    return pad(s.getDate())+'.'+pad(s.getMonth()+1)+' → '+pad(e.getDate())+'.'+pad(e.getMonth()+1)+'.'+e.getFullYear();
+  }
+  return fmtDMY(s)+' → '+fmtDMY(e);
+}
+
+// Універсальна мітка: для завершених — дата релізу (end), для запланованих — діапазон з датою релізу
+function computeDisplayLabel(r){
+  const endStr = r.end ? fmtDMY(new Date(r.end)) : null;
+  const range  = fmtRange(r.start, r.end);
+  if(r._userMarked){
+    return endStr ? '✓ Реалізовано · '+endStr+' (вручну)' : '✓ Реалізовано (вручну)';
+  }
+  switch(r.status){
+    case 'done':     return endStr ? 'Реалізовано · '+endStr : 'Реалізовано';
+    case 'next':     return range  ? 'Заплановано · '+range  : 'Заплановано';
+    case 'later':    return range  ? 'План · '+range         : 'Перспектива';
+    case 'deferred': return range  ? 'Заплановано (з відкладеного) · '+range : 'Відкладено — після супроводу';
+  }
+  return r.statusLabel;
+}
+
+function applyOverridesToData(){
+  const statusO=loadOverrides();
+  const datesO=loadDates();
+  DATA.forEach(r=>{
+    // reset до оригіналу
+    r.status=r._origStatus; r.statusLabel=r._origStatusLabel;
+    r.start=r._origStart; r.end=r._origEnd;
+    r._userMarked=false; r._userDates=false;
+    // date override
+    const dov=datesO[r.rel];
+    if(dov && dov.start && dov.end){
+      r.start=dov.start; r.end=dov.end; r._userDates=true;
+      if(r._origStatus==='next'){
+        r.statusLabel='Заплановано · '+fmtDMY(new Date(dov.start));
+      } else if(r._origStatus==='later'){
+        r.statusLabel='План · '+fmtDMY(new Date(dov.start));
+      } else if(r._origStatus==='deferred'){
+        r.statusLabel='Заплановано (з відкладеного) · '+fmtDMY(new Date(dov.start));
+      }
+    }
+    // status "done" override (останнім, щоб мітка стала «виконано»)
+    if(statusO[r.rel]==='done' && r._origStatus!=='deferred' && r._origStatus!=='done'){
+      r.status='done'; r.statusLabel='✓ Реалізовано (вручну)'; r._userMarked=true;
+    }
+  });
+}
+function categorySlug(c){if(!c)return null;if(c.startsWith('Виписка'))return 'vypyska';if(c.startsWith('Супровід'))return 'suprovid';return null;}
+function catEmoji(c){if(!c)return '';if(c.startsWith('Виписка'))return '🗂';if(c.startsWith('Супровід'))return '🔧';return '';}
+function catSubtitle(c){if(!c)return '';if(c.startsWith('Виписка'))return 'Релізи 4–6 · від створення клієнта та договору до фінальної виписки';if(c.startsWith('Супровід'))return 'Релізи 7–9 · внесення змін у діючі договори';return '';}
+
+function renderList(){
+  tl.innerHTML=''; rail.innerHTML='';
+  let lastCategory=null;
+  DATA.forEach(r=>{
+    // rail node
+    const node = document.createElement('div');
+    node.className='rail-node';
+    node.innerHTML=`<span class="rn-dot dot-${r.status}"></span>
+      <div class="rn-rel">РЕЛІЗ ${r.rel}</div>
+      <div class="rn-name">${r.title}</div>`;
+    node.onclick=()=>{
+      const card=document.getElementById('rel-'+r.rel);
+      openCard(card,true);
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+    };
+    rail.appendChild(node);
+
+    // section header при зміні категорії
+    if(r.category && r.category!==lastCategory){
+      const slug=categorySlug(r.category);
+      const header=document.createElement('div');
+      header.className='tl-category c-'+slug;
+      header.innerHTML=`
+        <div class="tl-cat-title"><span class="tc-emoji">${catEmoji(r.category)}</span>${r.category}</div>
+        <div class="tl-cat-sub">${catSubtitle(r.category)}</div>`;
+      tl.appendChild(header);
+    }
+    lastCategory = r.category || lastCategory;
+
+    // timeline card
+    const rel=document.createElement('div');
+    rel.className='rel s-'+r.status;
+    rel.id='rel-'+r.rel;
+    rel.dataset.status=r.status;
+    if(r.category) rel.dataset.category=r.category;
+
+    const catChip = r.category
+      ? `<span class="cat-chip c-${categorySlug(r.category)}">${catEmoji(r.category)} ${r.category}</span>`
+      : '';
+    const userTag = r._userMarked ? '<span class="user-done-tag">вручну</span>' : '';
+    const datesTag = r._userDates ? '<span class="user-dates-tag">дати змінено</span>' : '';
+    const showToggle = r._origStatus!=='done' && r._origStatus!=='deferred';
+    const toggleBtn = !showToggle ? '' :
+      `<button class="done-toggle${r._userMarked?' marked':''}" data-rel="${r.rel}" title="${r._userMarked?'Скасувати позначку':'Позначити реліз виконаним'}" onclick="event.stopPropagation();toggleDone('${r.rel}')">${r._userMarked?'Виконано (скасувати)':'Позначити виконаним'}</button>`;
+    const dateBtn = `<button class="date-edit-btn${r._userDates?' custom':''}" title="${r._userDates?'Дати змінено вручну — клікніть, щоб редагувати':((r.start&&r.end)?'Змінити дати релізу':'Задати дати релізу')}" onclick="event.stopPropagation();openDateEditor('${r.rel}',this)">📅 Дати</button>`;
+
+    const groupsHTML=r.groups.map(g=>`
+      <div class="grp">
+        <div class="grp-name"><span class="gn-ico">${g.ico}</span>${g.name}</div>
+        <div class="feats">
+          ${g.items.map(i=>`<div class="feat"><span>${i}</span></div>`).join('')}
+        </div>
+      </div>`).join('');
+
+    rel.innerHTML=`
+      <div class="rel-marker"></div>
+      <div class="rel-card">
+        <div class="rel-head" onclick="toggleCard('rel-${r.rel}')">
+          <div class="rel-badge"><span class="rb-r">РЕЛІЗ</span><span class="rb-n">${r.rel}</span></div>
+          <div class="rel-head-main">
+            <div class="rel-title">${r.title}</div>
+            <div class="rel-value">${r.value}</div>
+            <div class="rel-meta">
+              ${catChip}
+              <span class="status-pill sp-${r.status}">${computeDisplayLabel(r)}</span>${userTag}${datesTag}
+              <span class="feat-count">${featTotal(r)} пунктів · ${r.groups.length} напрямів</span>
+            </div>
+          </div>
+          ${dateBtn}
+          ${toggleBtn}
+          <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="rel-body"><div class="rel-body-inner">${groupsHTML}</div></div>
+      </div>`;
+    tl.appendChild(rel);
+  });
+}
+
+function updateStats(){
+  const c={done:0,next:0,later:0,deferred:0};
+  DATA.forEach(r=>c[r.status]++);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('statTotal',DATA.length);
+  set('statDone',c.done);
+  set('statNext',c.next+c.later);
+  set('statDeferred',c.deferred);
+}
+
+function toggleDone(rel){
+  const o=loadOverrides();
+  if(o[rel]==='done') delete o[rel]; else o[rel]='done';
+  saveOverrides(o);
+  fullRerender();
+}
+
+function fullRerender(){
+  const openIds=[...document.querySelectorAll('.rel.open')].map(el=>el.id);
+  document.body.classList.add('no-anim');                                   // не програвати entrance-анімації при re-render
+  applyOverridesToData();
+  renderList();
+  initGState();
+  if(typeof renderGantt==='function') renderGantt();
+  if(typeof renderPlanProgress==='function') renderPlanProgress();
+  updateStats();
+  if(typeof updateSaveBarCount==='function') updateSaveBarCount();
+  openIds.forEach(id=>{const card=document.getElementById(id);if(card) openCard(card,true);});
+  requestAnimationFrame(()=>document.body.classList.remove('no-anim'));
+}
+
+/* === Редактор дат релізу (попап) === */
+function setDates(rel, start, end){
+  const d=loadDates();
+  if(!start||!end) delete d[rel]; else d[rel]={start,end};
+  saveDatesLS(d);
+  fullRerender();
+}
+let _currentEditRel=null;
+function openDateEditor(rel, anchor){
+  const r=DATA.find(x=>x.rel===rel); if(!r) return;
+  _currentEditRel=rel;
+  const de=document.getElementById('dateEditor');
+  const bd=document.getElementById('deBackdrop');
+  de.querySelector('.de-rel').textContent=rel;
+  document.getElementById('deStart').value=r.start||'';
+  document.getElementById('deEnd').value=r.end||'';
+  document.getElementById('deReset').style.display=r._userDates?'':'none';
+  updateDeDuration();
+  bd.classList.add('show');
+  de.classList.add('show');
+  // Позиціонування біля кнопки, з корекцією за межі viewport
+  const rect=anchor.getBoundingClientRect();
+  const editorW=340;
+  let left=rect.left+window.scrollX;
+  if(left+editorW>window.innerWidth-16) left=Math.max(16,window.innerWidth-editorW-16+window.scrollX);
+  de.style.left=left+'px';
+  de.style.top=(rect.bottom+window.scrollY+8)+'px';
+  setTimeout(()=>document.getElementById('deStart').focus(),50);
+}
+function closeDateEditor(){
+  document.getElementById('dateEditor').classList.remove('show');
+  document.getElementById('deBackdrop').classList.remove('show');
+  _currentEditRel=null;
+}
+function updateDeDuration(){
+  const s=document.getElementById('deStart').value;
+  const e=document.getElementById('deEnd').value;
+  const el=document.getElementById('deDuration');
+  if(s && e){
+    if(new Date(e)<new Date(s)){el.innerHTML='<span style="color:#ff5d6c">Кінець має бути після старту</span>';return;}
+    const days=Math.round((new Date(e)-new Date(s))/DAY)+1;
+    const weeks=Math.max(1,Math.round(days/7));
+    el.innerHTML='Тривалість: <b>'+days+' '+pluralDays(days)+'</b> · ≈'+weeks+' тиж';
+  } else {
+    el.textContent='Виберіть дати старту й кінця';
+  }
+}
+document.getElementById('deStart').addEventListener('input',updateDeDuration);
+document.getElementById('deEnd').addEventListener('input',updateDeDuration);
+document.getElementById('deSave').onclick=()=>{
+  if(!_currentEditRel) return;
+  const s=document.getElementById('deStart').value;
+  const e=document.getElementById('deEnd').value;
+  if(!s||!e){alert('Виберіть обидві дати');return;}
+  if(new Date(e)<new Date(s)){alert('Кінцева дата має бути після стартової');return;}
+  setDates(_currentEditRel,s,e);
+  closeDateEditor();
+};
+document.getElementById('deCancel').onclick=closeDateEditor;
+document.getElementById('deReset').onclick=()=>{
+  if(!_currentEditRel) return;
+  if(!confirm('Повернути дати цього релізу до оригіналу з документа?')) return;
+  setDates(_currentEditRel,null,null);
+  closeDateEditor();
+};
+document.getElementById('deBackdrop').onclick=closeDateEditor;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&_currentEditRel) closeDateEditor();});
+
+/* === Toast + counters === */
+let _toastEl=null, _toastT=null;
+function showToast(msg,type='info',ms=3300){
+  if(!_toastEl){_toastEl=document.createElement('div');_toastEl.className='toast';document.body.appendChild(_toastEl);}
+  _toastEl.textContent=msg; _toastEl.className='toast t-'+type;
+  requestAnimationFrame(()=>_toastEl.classList.add('show'));
+  clearTimeout(_toastT);
+  _toastT=setTimeout(()=>_toastEl.classList.remove('show'),ms);
+}
+function pluralChanges(n){n=Math.abs(n);const m=n%10,t=n%100;if(t>=11&&t<=14)return 'змін';if(m===1)return 'зміна';if(m>=2&&m<=4)return 'зміни';return 'змін';}
+function countLocalEdits(){return Object.keys(loadOverrides()).length+Object.keys(loadDates()).length;}
+function updateSaveBarCount(){
+  const n=countLocalEdits();
+  const el=document.getElementById('sbCount'); if(!el) return;
+  if(n>0){el.textContent=n+' '+pluralChanges(n);el.classList.add('on');}
+  else{el.textContent='';el.classList.remove('on');}
+}
+
+/* === URL state (посилання зі змінами) === */
+function applyURLState(){
+  if(!location.hash.startsWith('#state=')) return false;
+  const existing=countLocalEdits();
+  if(existing>0 && !confirm(`Це посилання містить ${countLocalEdits()>0?'чужі':''} зміни. Застосувати? Ваші локальні зміни (${existing} ${pluralChanges(existing)}) буде замінено.`)){
+    history.replaceState(null,'',location.pathname);
+    return false;
+  }
+  try{
+    const encoded=location.hash.slice('#state='.length);
+    const raw=decodeURIComponent(escape(atob(encoded)));
+    const state=JSON.parse(raw);
+    saveOverrides(state.o||{});
+    saveDatesLS(state.d||{});
+    history.replaceState(null,'',location.pathname);
+    showToast('✓ Стан із посилання застосовано','success');
+    return true;
+  }catch(err){console.warn('Bad state hash:',err);showToast('Не вдалось розібрати посилання','error');return false;}
+}
+function copyStateLink(){
+  const n=countLocalEdits();
+  if(n===0){showToast('Немає змін для шерингу — вносьте зміни й повторіть','error');return;}
+  const state={o:loadOverrides(),d:loadDates()};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  const url=location.origin+location.pathname+'#state='+encoded;
+  const done=()=>showToast(`✓ Посилання скопійовано (${n} ${pluralChanges(n)}). Надішліть — і одержувач побачить ваш стан.`,'success',4500);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=>{prompt('Скопіюйте посилання вручну (Ctrl/Cmd+C):',url);});
+  } else {
+    prompt('Скопіюйте посилання вручну (Ctrl/Cmd+C):',url);
+  }
+}
+
+/* === Завантажити оновлений HTML для коміта в GitHub === */
+async function downloadUpdatedHTML(){
+  try{
+    const resp=await fetch(location.pathname+'?_t='+Date.now(),{cache:'no-store'});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    let html=await resp.text();
+    // clean DATA — прибираємо внутрішні поля, приводимо мітки
+    const clean=DATA.map(r=>{
+      const c={rel:r.rel,status:r.status};
+      // label обчислюємо з поточного статусу+дати, прибираючи «(вручну)»/«(з відкладеного)»
+      c.statusLabel=computeDisplayLabel(r).replace(' (вручну)','').replace(' (з відкладеного)','');
+      if(r.category) c.category=r.category;
+      c.start=r.start; c.end=r.end;
+      c.title=r.title; c.value=r.value;
+      c.groups=r.groups;
+      return c;
+    });
+    const newDataStr='const DATA = '+JSON.stringify(clean,null,2)+';';
+    const re=/const DATA = \[[\s\S]*?\n\];/;
+    if(!re.test(html)){showToast('Не вдалось знайти блок DATA у файлі','error');return;}
+    html=html.replace(re,newDataStr);
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='index.html'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    showToast('✓ Файл index.html завантажено. Замініть його у репозиторії GitHub і зробіть commit.','success',5000);
+  }catch(err){
+    console.error(err);
+    showToast('Помилка: '+err.message+' — відкрийте сторінку через сервер (GitHub Pages), а не file://','error',6000);
+  }
+}
+
+/* === Скинути всі локальні зміни === */
+function clearAllLocal(){
+  const n=countLocalEdits();
+  if(n===0){showToast('Локальних змін немає','info');return;}
+  if(!confirm(`Скинути всі ваші локальні зміни (${n} ${pluralChanges(n)})? Дані повернуться до оригіналу з документа.`)) return;
+  saveOverrides({}); saveDatesLS({});
+  fullRerender();
+  showToast('✓ Локальні зміни скинуто','success');
+}
+
+// перше рендерування (спочатку — стан з URL, якщо є)
+applyURLState();
+applyOverridesToData();
+renderList();
+updateSaveBarCount();
+
+function openCard(card,force){
+  const body=card.querySelector('.rel-body');
+  const isOpen=card.classList.contains('open');
+  if(force && isOpen) return;
+  card.classList.add('open');
+  body.style.maxHeight=body.scrollHeight+'px';
+}
+function toggleCard(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.rel-body');
+  if(card.classList.contains('open')){
+    card.classList.remove('open');
+    body.style.maxHeight=null;
+  }else{
+    card.classList.add('open');
+    body.style.maxHeight=body.scrollHeight+'px';
+  }
+}
+
+// filters
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.onclick=()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    const f=chip.dataset.f;
+    document.querySelectorAll('.rel').forEach(rel=>{
+      rel.style.display=(f==='all'||rel.dataset.status===f)?'':'none';
+    });
+  };
+});
+
+// expand all toggle
+let allOpen=false;
+document.getElementById('expandAll').onclick=(e)=>{
+  e.preventDefault();
+  allOpen=!allOpen;
+  document.querySelectorAll('.rel').forEach(rel=>{
+    if(rel.style.display==='none')return;
+    const body=rel.querySelector('.rel-body');
+    if(allOpen){rel.classList.add('open');body.style.maxHeight=body.scrollHeight+'px';}
+    else{rel.classList.remove('open');body.style.maxHeight=null;}
+  });
+  e.target.textContent=allOpen?'Згорнути всі':'Розгорнути всі';
+};
+
+/* ===== GANTT (день-вісь, перетягувані смуги) ===== */
+const MON=["Січ","Лют","Бер","Кві","Тра","Чер","Лип","Сер","Вер","Жов","Лис","Гру"];
+const DAY=864e5;
+function dObj(s){const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function daysIn(y,m){return new Date(y,m+1,0).getDate();}
+function fmtMY(dt){return MON[dt.getMonth()]+" '"+String(dt.getFullYear()).slice(2);}
+function fmtFull(dt){const d=String(dt.getDate()).padStart(2,'0'),m=String(dt.getMonth()+1).padStart(2,'0');return d+"."+m+"."+dt.getFullYear();}
+function weeksBetween(a,b){return Math.max(1,Math.round((b-a)/DAY/7));}
+
+let gstate=null, GAXIS=null;
+function initGState(){gstate=DATA.map(r=>({rel:r.rel,status:r.status,title:r.title,category:r.category||null,start:r.start?dObj(r.start):null,end:r.end?dObj(r.end):null}));}
+
+function renderGantt(){
+  if(!gstate) initGState();
+  const g=document.getElementById('gantt');
+  const dated=gstate.filter(x=>x.start&&x.end);
+  const minD=new Date(Math.min(...dated.map(x=>+x.start)));
+  const maxD=new Date(Math.max(...dated.map(x=>+x.end)));
+  const aStart=new Date(minD.getFullYear(),minD.getMonth(),1);            // 1-ше число найранішого місяця
+  const aEnd=new Date(maxD.getFullYear(),maxD.getMonth()+3,0);            // кінець місяця + 2 (запас для перетягування)
+  const totalDays=Math.round((aEnd-aStart)/DAY)+1;
+  const months=[]; let cur=new Date(aStart);
+  while(cur<=aEnd){const y=cur.getFullYear(),m=cur.getMonth();months.push({y,m,days:daysIn(y,m)});cur=new Date(y,m+1,1);}
+  const colTmpl=months.map(mo=>mo.days+'fr').join(' ');                   // ширина місяця пропорційна к-сті днів
+  GAXIS={aStart:+aStart,aEnd:+aEnd,totalDays};
+  const pct=ms=>(ms-(+aStart))/DAY/totalDays*100;
+
+  const tPct=pct(Date.now());
+  const showToday=tPct>=0&&tPct<=100;
+
+  let mcells="";
+  months.forEach((mo,i)=>{
+    const showYear=(mo.m===0)||(i===0);
+    mcells+=`<div class="g-mcell${mo.m%3===0?' q1':''}">${MON[mo.m]}${showYear?" '"+String(mo.y).slice(2):""}</div>`;
+  });
+  let html=`<div class="g-row head"><div class="g-label"><strong style="font-size:11.5px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:.08em">Реліз / задача</strong></div>`+
+    `<div class="g-track" style="min-height:auto;position:relative"><div class="g-months" style="grid-template-columns:${colTmpl}">${mcells}</div>`+
+    (showToday?`<div class="g-today-head" style="left:${tPct}%"></div>`:``)+`</div></div>`;
+
+  gstate.forEach(s=>{
+    const noBar=!s.start||!s.end;                                            // нема бару лише якщо нема дат
+    let trackInner;
+    if(noBar){
+      trackInner=`<div class="g-grid" style="grid-template-columns:${colTmpl}">${'<span></span>'.repeat(months.length)}</div>`+
+        (showToday?`<div class="g-today" style="left:${tPct}%"></div>`:``)+
+        `<div class="g-deferred" data-rel="${s.rel}" title="Реліз ${s.rel}: ${s.title} — дат ще нема" onclick="gotoRelease('${s.rel}')">↪ Відкладено — натисніть, щоб задати дати</div>`;
+    } else {
+      const L=pct(+s.start), W=(Math.round((s.end-s.start)/DAY)+1)/totalDays*100;
+      const wk=weeksBetween(s.start,s.end);
+      trackInner=`<div class="g-grid" style="grid-template-columns:${colTmpl}">${'<span></span>'.repeat(months.length)}</div>`+
+        (showToday?`<div class="g-today" style="left:${tPct}%"></div>`:``)+
+        `<div class="g-bar ${s.status}" data-rel="${s.rel}" style="left:${L}%;width:${W}%" title="${gbarTitle(s)}"><span class="gb-txt">≈${wk} тиж</span><div class="g-handle l"></div><div class="g-handle r"></div></div>`;
+    }
+    const durTxt=noBar?'Поза графіком · дати не задано':`${fmtMY(s.start)} – ${fmtMY(s.end)} · ≈${weeksBetween(s.start,s.end)} тиж`;
+    const catStrip = s.category ? `<div class="g-cat-strip c-${categorySlug(s.category)}" title="${s.category}"></div>` : '';
+    html+=`<div class="g-row s-${s.status}" data-rel="${s.rel}">
+      <div class="g-label">${catStrip}
+        <div class="gl-badge">${s.rel}</div>
+        <div class="gl-txt"><div class="gl-name">${s.title}</div><div class="gl-dur">${durTxt}</div></div>
+      </div>
+      <div class="g-track">${trackInner}</div>
+    </div>`;
+  });
+  g.innerHTML=html;
+  g.querySelectorAll('.g-bar').forEach(attachDrag);
+}
+
+function gbarTitle(s){return 'Реліз '+s.rel+': '+s.title+' — '+fmtFull(s.start)+' → '+fmtFull(s.end)+' (≈'+weeksBetween(s.start,s.end)+' тиж)';}
+
+function updateBar(bar,s){
+  const L=(+s.start-GAXIS.aStart)/DAY/GAXIS.totalDays*100;
+  const W=(Math.round((s.end-s.start)/DAY)+1)/GAXIS.totalDays*100;
+  const wk=weeksBetween(s.start,s.end);
+  bar.style.left=L+'%'; bar.style.width=W+'%';
+  bar.querySelector('.gb-txt').textContent='≈'+wk+' тиж';
+  bar.title=gbarTitle(s);
+  const dur=bar.closest('.g-row').querySelector('.gl-dur');
+  dur.textContent=fmtMY(s.start)+' – '+fmtMY(s.end)+' · ≈'+wk+' тиж';
+}
+
+function attachDrag(bar){
+  let moved=false;
+  bar.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    const s=gstate.find(x=>x.rel===bar.dataset.rel);
+    const track=bar.parentElement;
+    const pxPerDay=track.clientWidth/GAXIS.totalDays;
+    const startX=e.clientX, os=+s.start, oe=+s.end;
+    const rect=bar.getBoundingClientRect(), offX=e.clientX-rect.left;
+    const mode = offX<11 ? 'l' : (offX>rect.width-11 ? 'r' : 'move');     // край → зміна тривалості, центр → зсув
+    moved=false;
+    bar.classList.add('dragging');
+    try{bar.setPointerCapture(e.pointerId);}catch(_){}
+    showDragToast(e.clientX,e.clientY,s);
+    function mv(ev){
+      const dd=Math.round((ev.clientX-startX)/pxPerDay);
+      if(dd!==0) moved=true;
+      let ns=os, ne=oe;
+      if(mode==='move'){
+        const d=Math.max(Math.round((GAXIS.aStart-os)/DAY),Math.min(Math.round((GAXIS.aEnd-oe)/DAY),dd));
+        ns=os+d*DAY; ne=oe+d*DAY;
+      } else if(mode==='r'){
+        ne=Math.min(oe+dd*DAY,GAXIS.aEnd);
+        if((ne-os)/DAY<7) ne=os+7*DAY;
+      } else {
+        ns=Math.max(os+dd*DAY,GAXIS.aStart);
+        if((oe-ns)/DAY<7) ns=oe-7*DAY;
+      }
+      s.start=new Date(ns); s.end=new Date(ne);
+      updateBar(bar,s);
+      showDragToast(ev.clientX,ev.clientY,s);
+    }
+    function up(){
+      bar.classList.remove('dragging');
+      try{bar.releasePointerCapture(e.pointerId);}catch(_){}
+      document.removeEventListener('pointermove',mv);
+      document.removeEventListener('pointerup',up);
+      hideDragToast();
+      if(moved){                                                            // зберегти нові дати у localStorage і оновити картку/статистику
+        const iso=d=>d.toISOString().slice(0,10);
+        setDates(bar.dataset.rel, iso(s.start), iso(s.end));
+      } else {
+        renderPlanProgress();
+      }
+      setTimeout(()=>{moved=false;},0);
+    }
+    document.addEventListener('pointermove',mv);
+    document.addEventListener('pointerup',up);
+  });
+  bar.addEventListener('click',()=>{ if(!moved) gotoRelease(bar.dataset.rel); });
+}
+
+document.getElementById('gReset').addEventListener('click',()=>{initGState();renderGantt();renderPlanProgress();});
+
+/* ===== UX/UI: plan progress, countdown chip, stat-click filter, drag toast, FAB ===== */
+function pluralDays(n){n=Math.abs(n);const m=n%10,t=n%100;if(t>=11&&t<=14)return 'днів';if(m===1)return 'день';if(m>=2&&m<=4)return 'дні';return 'днів';}
+
+function planMeta(){
+  if(!gstate) initGState();
+  const dated=gstate.filter(x=>x.start&&x.end);
+  if(!dated.length) return null;
+  const start=new Date(Math.min(...dated.map(x=>+x.start)));
+  const end=new Date(Math.max(...dated.map(x=>+x.end)));
+  const now=new Date();
+  const totalDays=Math.max(1,Math.round((end-start)/DAY));
+  const elapsed=Math.max(0,Math.min(totalDays,Math.round((now-start)/DAY)));
+  const pct=elapsed/totalDays*100;
+  const upcoming=dated.filter(x=>x.start>now).sort((a,b)=>a.start-b.start);
+  const next=upcoming[0]||null;
+  const daysToNext=next?Math.round((next.start-now)/DAY):null;
+  const doneCount=gstate.filter(x=>x.status==='done').length;
+  const deferredCount=gstate.filter(x=>x.status==='deferred').length;
+  return {start,end,now,pct,next,daysToNext,doneCount,totalCount:gstate.length,deferredCount};
+}
+
+function renderPlanProgress(){
+  const m=planMeta(); if(!m) return;
+  const el=document.getElementById('planProgress'); if(!el) return;
+  const cd = m.daysToNext===null
+    ? '<span class="pp-countdown done-state">🎉 Усі релізи завершено</span>'
+    : (m.daysToNext===0
+        ? `<span class="pp-countdown">🚀 «Реліз ${m.next.rel}» стартує сьогодні</span>`
+        : `<span class="pp-countdown">🚀 До «Реліз ${m.next.rel}» — ${m.daysToNext} ${pluralDays(m.daysToNext)}</span>`);
+  el.innerHTML=`
+    <div class="pp-head">
+      <span class="pp-title">Прогрес плану в часі</span>
+      <span class="pp-pct">${m.pct.toFixed(0)}%</span>
+    </div>
+    <div class="pp-track">
+      <div class="pp-fill" style="width:${m.pct}%"></div>
+      <div class="pp-marker" title="сьогодні" style="left:calc(${m.pct}% - 1px)"></div>
+    </div>
+    <div class="pp-meta">
+      ${cd}
+      <span>Готово: <b>${m.doneCount}/${m.totalCount}</b></span>
+      <span>Відкладено: <b>${m.deferredCount}</b></span>
+      <span>План: <b>${fmtMY(m.start)} – ${fmtMY(m.end)}</b></span>
+    </div>`;
+}
+
+// click on stat → switch to timeline view and apply matching filter
+function bindStatClicks(){
+  const stats=document.querySelectorAll('.stats .stat');
+  const map=['','done','roadmap','deferred'];                               // 1st stat (total) — без фільтра
+  stats.forEach((st,i)=>{
+    const k=map[i]; if(!k) return;
+    st.classList.add('clickable');
+    st.addEventListener('click',()=>{
+      document.querySelector('.vs-btn[data-v="timeline"]').click();
+      if(k==='roadmap'){
+        // «У роадмепі» = next + later одночасно
+        document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+        document.querySelectorAll('.rel').forEach(rel=>{
+          const s=rel.dataset.status;
+          rel.style.display=(s==='next'||s==='later')?'':'none';
+        });
+      } else {
+        const chip=document.querySelector(`.chip[data-f="${k}"]`);
+        if(chip) chip.click();
+      }
+      const tgt=document.querySelector('.filters');
+      if(tgt) window.scrollTo({top:tgt.getBoundingClientRect().top+window.scrollY-12,behavior:'smooth'});
+    });
+  });
+}
+
+// floating drag toast
+const _dragToast=document.createElement('div');
+_dragToast.className='drag-toast';
+_dragToast.innerHTML='<span class="dt-dates"></span><span class="dt-wk"></span>';
+document.body.appendChild(_dragToast);
+function showDragToast(x,y,s){
+  _dragToast.querySelector('.dt-dates').textContent=fmtFull(s.start)+' → '+fmtFull(s.end);
+  _dragToast.querySelector('.dt-wk').textContent='≈'+weeksBetween(s.start,s.end)+' тиж';
+  _dragToast.style.left=x+'px'; _dragToast.style.top=y+'px';
+  _dragToast.classList.add('show');
+}
+function hideDragToast(){_dragToast.classList.remove('show');}
+
+// scroll-to-top FAB
+function setupFAB(){
+  const fab=document.createElement('button');
+  fab.className='fab-up'; fab.title='Нагору'; fab.setAttribute('aria-label','Нагору'); fab.textContent='↑';
+  fab.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  document.body.appendChild(fab);
+  const onScroll=()=>fab.classList.toggle('show',window.scrollY>720);
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+}
+
+function gotoRelease(n){
+  document.querySelector('.vs-btn[data-v="timeline"]').click();
+  const card=document.getElementById('rel-'+n);
+  openCard(card,true);
+  card.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* view switching */
+document.querySelectorAll('.vs-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.vs-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    document.getElementById('view-'+b.dataset.v).classList.add('active');
+  };
+});
+
+// build gantt + UX (progress, FAB, stat clicks, live stats). Усі картки стартують згорнутими.
+window.addEventListener('load',()=>{
+  renderGantt();
+  renderPlanProgress();
+  bindStatClicks();
+  setupFAB();
+  updateStats();
+});
+</script>
+</body>
+</html>
